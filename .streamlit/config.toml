@@ -1,3 +1,6 @@
-git add .
-git commit -m "Prompt 7: visual redesign"
-git push
+[theme]
+primaryColor = "#FF6B5B"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F6F3FC"
+textColor = "#1E1533"
+font = "sans serif"
