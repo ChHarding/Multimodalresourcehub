@@ -52,8 +52,8 @@ ROLES = {"student": "Student", "instructor": "Instructor"}
 # Email endings treated as institutional. Edit this list for the schools you expect.
 INSTITUTIONAL_SUFFIXES = (".edu", ".ac.uk", ".edu.au", ".ac.nz", ".edu.sg")
 
-MIN_PASSWORD_LENGTH = 10
-MAX_PASSWORD_LENGTH = 128
+MIN_PASSWORD_LENGTH = 6
+MAX_PASSWORD_LENGTH = 20
 MAX_LOGIN_FAILURES = 5            # wrong passwords allowed before a temporary lock
 LOCKOUT_SECONDS = 15 * 60
 CODE_TTL_SECONDS = 15 * 60        # how long an emailed code stays valid
