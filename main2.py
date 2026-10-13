@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 16361)
+Total output lines: 1063
+
 """
 Multimodal Studio Hub
 Run with:  pip install -r requirements.txt  then  streamlit run <this file>
@@ -308,277 +311,7 @@ LESSON_PLANS = [
      "assessment": "Grade the storyboard as a draft: claim, evidence plan, and source notes."},
     {"id": "website-portfolio-build", "title": "Building a Simple Portfolio Website", "genre": "Website",
      "level": "200-level", "duration_min": 120,
-     "description": "A studio session that takes students from a site map to a first working page.",
-     "objectives": ["Plan navigation that serves a defined audience", "Build and test one accessible page"],
-     "materials": ["Website builder accounts", "Site map template", "Accessibility checklist"],
-     "prep": "Confirm every student can log in to the website builder before class.",
-     "timeline": [(20, "Tour two model sites and list navigation choices"), (40, "Sketch the site map and page layouts"),
-                  (40, "Build a first page in the website builder"), (20, "Test with a classmate using only a keyboard")],
-     "assessment": "Review the first page against the accessibility checklist."},
-    {"id": "comics-explain-a-concept", "title": "Explaining a Concept in Comic Form", "genre": "Comics",
-     "level": "100-level", "duration_min": 45,
-     "description": "Students thumbnail a four-panel comic that explains one idea from the course.",
-     "objectives": ["Translate an abstract concept into sequential images", "Balance text and image within each panel"],
-     "materials": ["Four-panel thumbnail sheet", "Model explanatory comic"],
-     "prep": "Prepare a short list of course concepts that students can choose from.",
-     "timeline": [(10, "Read a one-page explanatory comic"), (25, "Thumbnail a four-panel explanation"), (10, "Swap and give feedback")],
-     "assessment": "Check whether a classmate can restate the concept after reading the thumbnails."},
-    {"id": "digital-story-turning-point", "title": "Finding the Turning Point in a Digital Story", "genre": "Digital Story",
-     "level": "100-level", "duration_min": 25,
-     "description": "A short mini-lesson that helps students find the moment their story turns.",
-     "objectives": ["Identify the turning point in a personal narrative", "Choose three images that support it"],
-     "materials": ["One-minute sample story", "Freewriting prompt"],
-     "prep": "Queue the sample story and share the freewriting prompt.",
-     "timeline": [(5, "Listen to a one-minute story"), (10, "Freewrite the turning point"), (10, "Pair share and choose three images")],
-     "assessment": "Collect the freewrite and the three-image list as an exit ticket."},
-    {"id": "ai-disclosure-multimodal", "title": "Responsible AI Use in Multimodal Projects", "genre": "Cross-genre",
-     "level": "200-level", "duration_min": 50,
-     "description": "Students apply the course AI policy to sample projects and write a disclosure statement.",
-     "objectives": ["Explain the course AI policy in their own words", "Write a disclosure statement for a project"],
-     "materials": ["Course AI policy", "Scenario cards"],
-     "prep": "Print the course AI policy and prepare four scenario cards.",
-     "timeline": [(10, "Discuss scenarios: allowed, allowed with disclosure, not allowed"), (25, "Annotate a sample project"), (15, "Draft a disclosure statement")],
-     "assessment": "Read the disclosure statements for accuracy and specificity."},
-    {"id": "poster-research-studio", "title": "Research Poster Studio", "genre": "Poster",
-     "level": "300-level and above", "duration_min": 60,
-     "description": "Students plan a conference-style poster and rehearse a two-minute talk.",
-     "objectives": ["Summarize research in a clear visual hierarchy", "Present findings in a two-minute talk"],
-     "materials": ["Poster layout template", "Two sample posters", "Timer"],
-     "prep": "Bring two printed posters, one strong and one cluttered, for comparison.",
-     "timeline": [(10, "Study two posters for hierarchy"), (30, "Draft a layout with headline, figure, and takeaway"), (20, "Two-minute practice talks in pairs")],
-     "assessment": "Use a short checklist during the practice talks: claim, evidence, and timing."},
-]
-LESSON_GENRES = sorted({p["genre"] for p in LESSON_PLANS})
-
-# Performance levels: each level earns a share of a criterion's maximum points.
-# Criterion maximums are multiples of 5 so every cell works out to a whole number.
-PERFORMANCE_LEVELS = [("Exemplary", 1.0), ("Proficient", 0.8), ("Developing", 0.6), ("Beginning", 0.4)]
-
-
-def level_points(max_points, share):
-    """Points earned at one level of one criterion, e.g. 25 x 0.8 = 20."""
-    return round(max_points * share)
-
-
-def crit(name, max_points, *descriptors):
-    """Build one criterion: a name, its maximum points, and one descriptor per performance level."""
-    assert len(descriptors) == len(PERFORMANCE_LEVELS)
-    return {"name": name, "max_points": max_points, "descriptors": list(descriptors)}
-
-
-# Each rubric totals 100 points. Keep text plain ASCII so the PDF fonts render it.
-RUBRICS = [
-    {"id": "website-rubric", "title": "Website Rubric", "genre": "Website",
-     "description": "Assesses a small multi-page website for audience focus, navigation, design, and accessibility.",
-     "criteria": [
-         crit("Purpose and audience", 25, "Purpose is clear and every page serves the intended audience.", "Purpose is clear; most pages serve the audience.",
-              "Purpose is present but the audience is unclear.", "Purpose and audience are not evident."),
-         crit("Organization and navigation", 25, "Navigation is intuitive and every page is easy to reach.", "Navigation is clear with minor inconsistencies.",
-              "Navigation is confusing in places.", "Pages are hard to find or connect."),
-         crit("Visual design and accessibility", 30, "Consistent design; alt text, contrast, and headings meet standards.", "Mostly consistent design; most accessibility needs are met.",
-              "Design is uneven; few accessibility needs are met.", "Design is cluttered; accessibility is not addressed."),
-         crit("Writing and sources", 20, "Concise web copy; all sources and images are credited.", "Clear copy; most sources are credited.",
-              "Copy is wordy or uneven; some credits are missing.", "Copy is unclear; sources are not credited."),
-     ]},
-    {"id": "podcast-rubric", "title": "Podcast Rubric", "genre": "Podcast",
-     "description": "Assesses a short audio episode for purpose, structure, sound quality, and attribution.",
-     "criteria": [
-         crit("Purpose and audience", 25, "Purpose is clear and shapes every segment.", "Purpose is clear in most segments.",
-              "Purpose appears but shifts.", "Purpose is unclear."),
-         crit("Script and structure", 25, "Opening, development, and close are polished and well paced.", "Structure is clear with minor lapses.",
-              "Structure is uneven or rushed.", "Structure is hard to follow."),
-         crit("Audio quality and sound design", 30, "Clean recording; music and effects add meaning.", "Clean recording; some purposeful sound choices.",
-              "Noticeable noise or uneven volume.", "Audio interferes with understanding."),
-         crit("Sources and attribution", 20, "All sources, music, and tools are credited.", "Most sources are credited.",
-              "Some credits are missing.", "Sources are not credited."),
-     ]},
-    {"id": "digital-story-rubric", "title": "Digital Story Rubric", "genre": "Digital Story",
-     "description": "Assesses a short narrated story for narrative arc, delivery, media choices, and reflection.",
-     "criteria": [
-         crit("Narrative arc", 30, "A clear turning point; the story builds and resolves.", "A clear arc with a modest turning point.",
-              "Events are listed with little shaping.", "No clear narrative structure."),
-         crit("Voice and delivery", 20, "Natural, expressive narration at a steady pace.", "Clear narration with minor pacing issues.",
-              "Narration is flat or rushed in places.", "Narration is hard to understand."),
-         crit("Image and sound choices", 30, "Images and sound deepen meaning and match the narration.", "Images and sound mostly support the narration.",
-              "Images and sound are loosely connected.", "Images and sound distract or are missing."),
-         crit("Reflection and revision", 20, "Thoughtful reflection explains choices and revisions.", "Reflection explains most choices.",
-              "Reflection is brief or general.", "No reflection is provided."),
-     ]},
-    {"id": "video-essay-rubric", "title": "Video Essay Rubric", "genre": "Video Essay",
-     "description": "Assesses a short video essay for its claim, use of evidence, pacing, and attribution.",
-     "criteria": [
-         crit("Claim and argument", 30, "A focused claim is developed across the whole essay.", "A clear claim with mostly consistent support.",
-              "The claim is present but loosely supported.", "No clear claim."),
-         crit("Visual and audio evidence", 30, "Images, voiceover, and text work together as evidence.", "Most visuals and audio support the claim.",
-              "Visuals and audio are loosely tied to the claim.", "Visuals and audio do not support the claim."),
-         crit("Pacing and editing", 20, "Cuts and timing keep the viewer oriented.", "Pacing is steady with minor rough cuts.",
-              "Pacing is uneven.", "Editing makes the essay hard to follow."),
-         crit("Sources and attribution", 20, "All sources and media are credited on screen or in notes.", "Most sources are credited.",
-              "Some credits are missing.", "Sources are not credited."),
-     ]},
-    {"id": "infographic-rubric", "title": "Infographic Rubric", "genre": "Infographic",
-     "description": "Assesses a single-page visual argument for its claim, hierarchy, accessibility, and sources.",
-     "criteria": [
-         crit("Claim and evidence", 30, "The claim is clear; evidence is accurate and relevant.", "The claim is clear; most evidence is relevant.",
-              "The claim or evidence is vague.", "No clear claim."),
-         crit("Visual hierarchy", 25, "The eye path is deliberate and easy to follow.", "Hierarchy is mostly clear.",
-              "Hierarchy is inconsistent.", "The layout is cluttered."),
-         crit("Accessibility and legibility", 25, "High contrast, readable type, and alt text.", "Most accessibility needs are met.",
-              "Some accessibility needs are met.", "Accessibility is not addressed."),
-         crit("Sources and attribution", 20, "All sources are credited on the page.", "Most sources are credited.",
-              "Some credits are missing.", "Sources are not credited."),
-     ]},
-]
-RUBRIC_GENRES = sorted(r["genre"] for r in RUBRICS)
-
-# ---------------------------------------------------------------------------
-# 4. REUSABLE UI COMPONENTS
-# Small helpers so every page draws cards the same way.
-# ---------------------------------------------------------------------------
-def esc(text):
-    """Escape text before placing it inside HTML."""
-    return html.escape(str(text))
-
-
-def slug(text):
-    """Lowercase, hyphenated version of a title; used to build unique container keys."""
-    return re.sub(r"[^a-z0-9]+", "-", str(text).lower()).strip("-")
-
-
-def card(key):
-    """Bordered container styled as a card (the key becomes a CSS class: st-key-card_<key>)."""
-    return st.container(border=True, key=f"card_{key}")
-
-
-def panel(key):
-    """Bordered container styled as a filter panel (CSS class: st-key-panel_<key>)."""
-    return st.container(border=True, key=f"panel_{key}")
-
-
-def notice(text, kind="alert", role="status"):
-    """Friendly message box. kind="alert" is coral (empty states, warnings); kind="success" is teal."""
-    st.markdown(f'<div class="notice {kind}" role="{role}">{esc(text)}</div>', unsafe_allow_html=True)
-
-
-def card_grid(items, render_fn, columns=2):
-    """Lay items out in a grid, filling columns left to right."""
-    cols = st.columns(columns)
-    for i, item in enumerate(items):
-        with cols[i % columns]:
-            render_fn(item)
-
-
-def render_exemplar(e):
-    """Bordered card: thumbnail placeholder, genre badge, title, description, objectives, link button."""
-    color = EXEMPLAR_GENRE_COLORS[e["genre"]]
-    with card(f'ex-{slug(e["title"])}'):
-        # Thumbnail placeholder (swap for st.image(...) when real screenshots exist)
-        st.markdown(
-            f'<div class="thumb" role="img" aria-label="Placeholder thumbnail for {esc(e["title"])}" style="background:{color}">'
-            f'<b>{esc(e["genre"])}</b><span>Thumbnail placeholder</span></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(f'<span class="badge" style="background:{color}">{esc(e["genre"])}</span>', unsafe_allow_html=True)
-        st.markdown(f'<h3 class="res-title">{esc(e["title"])}</h3>', unsafe_allow_html=True)
-        st.caption(e["course"])
-        st.write(e["description"])
-        st.markdown("**Learning objectives**")
-        for obj in e["objectives"]:
-            st.markdown(f"- {obj}")
-        # The title in the label keeps each link distinct for screen reader users
-        st.link_button(f'View {e["title"]}', e["url"], help="Opens the project in a new tab")
-
-
-def search_resources(resources, query, genre):
-    """
-    Keyword search with a genre filter.
-    1. Lowercase the query and split it into terms.
-    2. Keep only resources in the chosen genre ("All genres" keeps everything).
-    3. Keep resources where EVERY term appears in the title, genre, description, or tags.
-    4. Rank by where terms match: title = 3 points, tags = 2, genre/description = 1.
-    """
-    terms = query.lower().split()
-    scored = []
-    for r in resources:
-        if genre != "All genres" and r["genre"] != genre:
-            continue
-        title = r["title"].lower()
-        tags = " ".join(r["tags"]).lower()
-        body = f'{r["genre"]} {r["description"]}'.lower()
-        searchable = f"{title} {tags} {body}"
-        if not all(t in searchable for t in terms):
-            continue
-        score = sum(3 * (t in title) + 2 * (t in tags) + (t in body) for t in terms)
-        scored.append((score, r))
-    scored.sort(key=lambda pair: (-pair[0], pair[1]["title"]))  # best score first, then A to Z
-    return [r for _, r in scored]
-
-
-def render_resource_card(r):
-    """Bordered card: genre badge, title, description, tags, and an expander for details."""
-    color = MODALITY_COLORS.get(r["modality"], "#16807A")
-    with card(f'res-{slug(r["title"])}'):
-        featured = ' <span class="badge success">Featured</span>' if r.get("featured") else ""
-        st.markdown(f'<span class="badge" style="background:{color}">{esc(r["genre"])}</span>{featured}', unsafe_allow_html=True)
-        st.markdown(f'<h3 class="res-title">{esc(r["title"])}</h3>', unsafe_allow_html=True)
-        st.write(r["description"])
-        st.markdown("".join(f'<span class="pill">{esc(t)}</span>' for t in r["tags"]), unsafe_allow_html=True)
-        with st.expander("View details"):
-            st.markdown(f'**Format:** {r["format"]}  \n**Course:** {r["course"]}  \n**Modality:** {r["modality"]}')
-            st.markdown("**What's included**")
-            for item in r["includes"]:
-                st.markdown(f"- {item}")
-            st.markdown("**Classroom use**")
-            st.write(r["classroom_use"])
-
-
-def page_header(title, blurb):
-    """Standard page title (h1) and a one-line lead paragraph."""
-    st.title(title)
-    st.markdown(f'<p class="lead">{esc(blurb)}</p>', unsafe_allow_html=True)
-
-
-def go_to(page):
-    """Button callback: switch the sidebar selection to another page."""
-    st.session_state["nav"] = page
-
-
-# ---------------------------------------------------------------------------
-# 5. PAGE FUNCTIONS
-# ---------------------------------------------------------------------------
-def page_home():
-    # Who is signed in decides the greeting, the hero buttons, and the order of the start-here cards
-    user = auth.current_user()
-    instructor = auth.is_instructor(user)
-    first = esc(user["display_name"].split()[0]) if user else ""
-    greeting = f"Welcome, {first}. " if first else ""
-    blurb = ("Plan lessons, grade with shared rubrics, and find resources and exemplars for multimodal projects in your courses."
-             if instructor else "Find resources, study exemplars, and use rubrics to plan your next multimodal project.")
-
-    # Hero banner with count chips (counts come from the data, so they stay accurate)
-    counts = [(len(RESOURCES), "resources"), (len(EXEMPLARS), "exemplars"), (len(LESSON_PLANS), "lesson plans"), (len(RUBRICS), "rubrics")]
-    chips = "".join(f'<div class="chip"><b>{n}</b>{label}</div>' for n, label in counts)
-    st.markdown(
-        '<div class="hero"><h1 class="hero-title">Teach and learn through writing, image, sound, and video.</h1>'
-        f"<p>{greeting}{blurb}</p>"
-        f'<div class="chips">{chips}</div></div>',
-        unsafe_allow_html=True,
-    )
-
-    # Calls to action under the hero (one primary, one secondary)
-    c1, c2, _ = st.columns([1, 1, 2])
-    if instructor:
-        c1.button("Open lesson plans", key="hero_primary", type="primary", on_click=go_to, args=("Lesson Plans",))
-        c2.button("Search resources", key="hero_secondary", on_click=go_to, args=("Search Resources",))
-    else:
-        c1.button("Search resources", key="hero_primary", type="primary", on_click=go_to, args=("Search Resources",))
-        c2.button("Browse exemplars", key="hero_secondary", on_click=go_to, args=("Browse Exemplars",))
-
-    # Start-here cards: each button jumps to a section
-    st.header("Start here")
-    links = [
-        ("Search Resources", "Find a resource", "Search guides, templates, and tools by keyword and genre."),
-        ("Browse Exemplars", "See student work", "Study sample projects with instructor commentary."),
+     "description": "A studio session that takes students from a site map to a first work…4361 tokens truncated…e Exemplars", "See student work", "Study sample projects with instructor commentary."),
         ("Lesson Plans", "Plan a session", "Open ready-to-adapt plans with timelines and materials."),
         ("Rubrics", "Choose a rubric", "Compare criteria and performance levels, then download as PDF or Word."),
     ]
@@ -809,8 +542,8 @@ def render_plan_card(plan):
 def lesson_download_message(user):
     """Explain why lesson plan downloads are locked for this user."""
     if auth.is_instructor(user):
-        return "Your instructor access is pending review, so lesson plan downloads are not unlocked yet. You can preview every plan."
-    return "Lesson plan downloads are available to verified instructors. You can preview every plan."
+        return "Your instructor account does not have download access. You can preview every plan."
+    return "Lesson plan downloads are available to instructor accounts. You can preview every plan."
 
 
 def reset_plan_filters():
@@ -824,7 +557,7 @@ def page_lessons():
     if auth.has_instructor_access(auth.current_user()):
         page_header("Lesson plans", "Preview sample plans for multimodal projects, then download them to adapt for your own course.")
     else:
-        page_header("Lesson plans", "Preview sample plans for multimodal projects. Downloads are available to verified instructors.")
+        page_header("Lesson plans", "Preview sample plans for multimodal projects. Downloads are available to instructor accounts.")
     st.session_state.setdefault("lp_genre", "All genres")
     st.session_state.setdefault("lp_level", "All levels")
     st.session_state.setdefault("lp_time", "Any length")
