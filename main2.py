@@ -16,6 +16,7 @@ File layout (top to bottom):
 import html
 import io
 import re
+import time
 import zipfile
 from pathlib import Path
 
@@ -1206,9 +1207,41 @@ PAGES = {
 }
 
 
+def show_welcome_splash():
+    """Show a welcome splash once per unauthenticated session, then continue to login."""
+    if st.session_state.get("welcome_splash_shown"):
+        return
+    st.session_state["welcome_splash_shown"] = True
+
+    st.markdown(
+        '<div class="hero"><h1 class="hero-title">Welcome to Multimodal Studio Hub</h1>'
+        '<p>Explore resources for creating, teaching, and learning through text, audio, video, and interactive media.</p></div>',
+        unsafe_allow_html=True,
+    )
+
+    intro_video = Path("assets/welcome-intro.mp4")
+    if intro_video.is_file():
+        st.video(str(intro_video))
+    else:
+        st.markdown(
+            '<div class="notice" role="note"><strong>Video introduction placeholder</strong><br>'
+            'Add a short video at <code>assets/welcome-intro.mp4</code> to display it here.</div>',
+            unsafe_allow_html=True,
+        )
+
+    countdown = st.empty()
+    for seconds_left in range(10, 0, -1):
+        countdown.caption(f"Continuing to sign in in {seconds_left} seconds…")
+        time.sleep(1)
+    countdown.empty()
+
+
 def main():
     st.markdown(CSS, unsafe_allow_html=True)
     st.session_state.setdefault("nav", "Home")
+
+    if not auth.current_user():
+        show_welcome_splash()
 
     # Logo block: shown on every screen, including sign in and the tutorial
     with st.sidebar:
