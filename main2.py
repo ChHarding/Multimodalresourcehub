@@ -488,6 +488,7 @@ def render_exemplar(e):
             st.markdown(f"- {obj}")
         # The title in the label keeps each link distinct for screen reader users
         st.link_button(f'View {e["title"]}', e["url"], help="Opens the project in a new tab")
+        render_related_resources("exemplar", e["genre"], e["title"])
 
 
 def search_resources(resources, query, genre):
@@ -531,6 +532,7 @@ def render_resource_card(r):
                 st.markdown(f"- {item}")
             st.markdown("**Classroom use**")
             st.write(r["classroom_use"])
+        render_related_resources("resource", r["genre"], r["title"])
 
 
 def page_header(title, blurb):
@@ -540,8 +542,55 @@ def page_header(title, blurb):
 
 
 def go_to(page):
-    """Button callback: switch the sidebar selection to another page."""
+    """Button callback: switch the active page."""
     st.session_state["nav"] = page
+
+
+def open_related_page(page, genre=None, query=None):
+    """Navigate to a page and apply its relevant filter before it renders."""
+    st.session_state["nav"] = page
+    if page == "Search Resources":
+        st.session_state["search_query"] = query or genre or ""
+        st.session_state["search_genre"] = "All genres"
+    elif page == "Browse Exemplars" and genre:
+        st.session_state["ex_genres"] = [genre]
+        st.session_state["ex_sort"] = SORT_OPTIONS[0]
+    elif page == "Lesson Plans" and genre:
+        st.session_state["lp_genre"] = genre
+    elif page == "Rubrics" and genre:
+        st.session_state["rb_genre"] = genre
+
+
+def render_related_resources(source_kind, genre, source_title):
+    """Show short, filtered links to other materials in the same genre."""
+    related = []
+    for resource in RESOURCES:
+        if resource["genre"] == genre and not (source_kind == "resource" and resource["title"] == source_title):
+            related.append(("Search Resources", resource["title"], resource["title"]))
+    for exemplar in EXEMPLARS:
+        if exemplar["genre"] == genre and not (source_kind == "exemplar" and exemplar["title"] == source_title):
+            related.append(("Browse Exemplars", exemplar["title"], genre))
+    for plan in LESSON_PLANS:
+        if plan["genre"] == genre and not (source_kind == "lesson" and plan["title"] == source_title):
+            related.append(("Lesson Plans", plan["title"], genre))
+    for rubric in RUBRICS:
+        if rubric["genre"] == genre and not (source_kind == "rubric" and rubric["title"] == source_title):
+            related.append(("Rubrics", rubric["title"], genre))
+
+    if not related:
+        return
+
+    with st.expander("Related resources"):
+        st.caption(f"More materials in {genre}")
+        for page, title, value in related[:6]:
+            label = f"{page}: {title}"
+            st.button(
+                label,
+                key=f"related-{slug(source_title)}-{slug(page)}-{slug(title)}",
+                on_click=open_related_page,
+                args=(page, genre, value if page == "Search Resources" else None),
+                use_container_width=True,
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -705,8 +754,11 @@ def page_about():
     with panel("about-cta"):
         st.header("Ready to explore?")
         st.write("Find a resource for your next project, course, or creative idea.")
-        st.button("Explore the Resource Library", key="about_library", type="primary",
+        c1, c2 = st.columns(2)
+        c1.button("Explore the Resource Library", key="about_library", type="primary",
                   on_click=go_to, args=("Search Resources",))
+        c2.button("Browse Exemplars", key="about_exemplars", on_click=go_to,
+                  args=("Browse Exemplars",))
 
 
 # --- Search page helpers: callbacks run before the page reruns, so they can set widget values ---
@@ -916,6 +968,7 @@ def render_plan_card(plan):
         if auth.has_instructor_access(auth.current_user()):
             st.download_button(f'Download {plan["title"]} (.txt)', data=plan_to_text(plan), file_name=f'{plan["id"]}.txt',
                                mime="text/plain", key=f'dl_{plan["id"]}', help="Saves a plain-text copy you can edit", type="primary")
+        render_related_resources("lesson", plan["genre"], plan["title"])
 
 
 def lesson_download_message(user):
@@ -1098,6 +1151,7 @@ def render_rubric_card(rubric):
         st.markdown(f'<span class="pill">Total: {total} points</span><span class="pill">{len(rubric["criteria"])} criteria</span>'
                     f'<span class="pill">{len(PERFORMANCE_LEVELS)} performance levels</span>', unsafe_allow_html=True)
         st.write(rubric["description"])
+        render_related_resources("rubric", rubric["genre"], rubric["title"])
         with st.expander("Preview rubric"):
             levels = ", ".join(f"{name} {round(share * 100)}%" for name, share in PERFORMANCE_LEVELS)
             st.caption(f"Each level earns a share of the criterion's points: {levels}.")
@@ -1181,4 +1235,3 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
