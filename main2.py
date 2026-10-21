@@ -134,6 +134,30 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 .stApp button, .stApp a, .stApp [role="button"], .stApp input[type="checkbox"],
 .stApp input[type="radio"], .stApp select, .stApp summary { cursor: pointer !important; }
 
+/* Clickable, progress-style top navigation */
+.st-key-nav [role="radiogroup"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 2px solid var(--line);
+}
+.st-key-nav [role="radiogroup"] label {
+    padding: 10px 14px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 4px solid transparent;
+}
+.st-key-nav [role="radiogroup"] label p {
+    font-weight: 700 !important;
+}
+.st-key-nav [role="radiogroup"] label:has(input:checked) {
+    background: var(--lavender) !important;
+    border-bottom-color: var(--coral) !important;
+}
+.st-key-nav [role="radiogroup"] label:has(input:checked) p {
+    color: var(--plum) !important;
+    font-weight: 700 !important;
+}
+
 /* Visible keyboard focus */
 .stApp button:focus-visible, .stApp input:focus-visible, .stApp a:focus-visible, .stApp [role="combobox"]:focus-visible, .stApp summary:focus-visible, .stApp label:has(input:focus-visible) { outline: 3px solid var(--plum) !important; outline-offset: 3px; }
 
