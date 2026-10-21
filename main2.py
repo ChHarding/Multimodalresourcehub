@@ -20,6 +20,7 @@ import zipfile
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 import auth  # accounts: sign up, log in, roles, and the onboarding tutorial (auth.py, same folder)
 
@@ -1236,6 +1237,52 @@ def main():
     )
 
     PAGES[st.session_state["nav"]]()
+
+    # Show a brief click ring across the Streamlit app.
+    components.html(
+        """
+        <script>
+        try {
+          const appWindow = window.parent;
+          const appDocument = appWindow.document;
+          if (!appWindow.__mshClickRingInstalled) {
+            appWindow.__mshClickRingInstalled = true;
+
+            const style = appDocument.createElement("style");
+            style.textContent = `
+              @keyframes msh-click-ring {
+                from { opacity: .9; transform: translate(-50%, -50%) scale(.7); }
+                to { opacity: 0; transform: translate(-50%, -50%) scale(1.8); }
+              }
+              .msh-click-ring {
+                position: fixed;
+                width: 28px;
+                height: 28px;
+                border: 3px solid #FF6B5B;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 2147483647;
+                animation: msh-click-ring .55s ease-out forwards;
+              }
+            `;
+            appDocument.head.appendChild(style);
+
+            appDocument.addEventListener("click", (event) => {
+              const ring = appDocument.createElement("span");
+              ring.className = "msh-click-ring";
+              ring.style.left = event.clientX + "px";
+              ring.style.top = event.clientY + "px";
+              appDocument.body.appendChild(ring);
+              appWindow.setTimeout(() => ring.remove(), 600);
+            }, true);
+          }
+        } catch (error) {
+          // The Streamlit component sandbox may block access to the parent page.
+        }
+        </script>
+        """,
+        height=0,
+    )
 
 
 if __name__ == "__main__":
