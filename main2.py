@@ -1165,7 +1165,7 @@ def main():
     user = auth.require_login()
 
     with st.sidebar:
-        st.radio("Navigate", list(PAGES), key="nav", label_visibility="collapsed")
+        st.radio("Navigate", list(PAGES), key="nav", horizontal=True, label_visibility="collapsed")
         auth.render_account_sidebar(user)  # name, role, replay tutorial, log out
         st.caption("All content is placeholder data. Replace it in Section 3 of this file.")
 
