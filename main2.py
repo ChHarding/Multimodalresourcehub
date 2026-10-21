@@ -17,6 +17,7 @@ import html
 import io
 import re
 import zipfile
+from pathlib import Path
 
 import streamlit as st
 
@@ -597,6 +598,117 @@ def page_home():
     card_grid(RESOURCES[:3], render_resource_card, columns=3)
 
 
+def page_about():
+    """About page for the Multimodal Studio Hub."""
+    st.markdown("""
+    <style>
+    .about-hero {
+        display: grid; grid-template-columns: 1.35fr 1fr; align-items: center;
+        gap: 32px; padding: clamp(24px, 5vw, 56px); margin-bottom: var(--s6);
+        color: #fff; background: radial-gradient(circle at 85% 15%, rgba(255,107,91,.42), transparent 32%),
+        radial-gradient(circle at 95% 100%, rgba(31,163,154,.38), transparent 35%), var(--plum);
+        border-radius: 20px; overflow: hidden;
+    }
+    .about-hero h1 { color: #fff !important; margin: 0 0 var(--s3); }
+    .about-hero p { color: #F6F3FC !important; font-size: 1.05rem; max-width: 52ch; }
+    .media-collage { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; transform: rotate(2deg); }
+    .media-tile { min-height: 118px; display: flex; flex-direction: column; justify-content: center;
+        align-items: center; border: 1px solid rgba(255,255,255,.3); border-radius: 16px;
+        color: #fff; background: rgba(255,255,255,.12); backdrop-filter: blur(5px); }
+    .media-tile span { font-size: 2rem; }
+    .media-tile small { font-size: .9rem; font-weight: 700; margin-top: 4px; }
+    .media-tile:nth-child(2) { background: rgba(255,107,91,.34); }
+    .media-tile:nth-child(3) { background: rgba(31,163,154,.34); }
+    .about-timeline { border-left: 3px solid var(--teal); padding: 4px 0 4px 20px; margin: 4px 0 20px; }
+    .about-timeline h3 { margin: 0 0 8px; }
+    .team-photo-fallback { min-height: 170px; display: grid; place-items: center; border-radius: 10px;
+        background: linear-gradient(135deg, #4B3A7A, #1FA39A); color: white;
+        font: 700 2.5rem 'Fraunces', Georgia, serif; }
+    @media (max-width: 700px) {
+        .about-hero { grid-template-columns: 1fr; }
+        .media-tile { min-height: 86px; }
+    }
+    </style>
+    <section class="about-hero" aria-labelledby="about-title">
+      <div>
+        <h1 id="about-title">Many ways to make meaning</h1>
+        <p>The Multimodal Studio Hub brings together practical resources, examples, and teaching ideas for creating with text, sound, video, and interactive media.</p>
+      </div>
+      <div class="media-collage" role="img" aria-label="A collage representing text, audio, video, and interactive media">
+        <div class="media-tile"><span aria-hidden="true">✍️</span><small>Text</small></div>
+        <div class="media-tile"><span aria-hidden="true">🎙️</span><small>Audio</small></div>
+        <div class="media-tile"><span aria-hidden="true">🎬</span><small>Video</small></div>
+        <div class="media-tile"><span aria-hidden="true">🖱️</span><small>Interactive</small></div>
+      </div>
+    </section>
+    """, unsafe_allow_html=True)
+
+    # The Why Block
+    st.header("Why multimodal learning?")
+    st.write("People communicate in many forms. The Hub helps learners and instructors choose, combine, and teach the formats that best serve their purpose.")
+    formats = [
+        ("✍️", "Text", "Shape ideas through writing, structure, and language."),
+        ("🎙️", "Audio", "Use voice, sound, and pacing to reach listeners."),
+        ("🎬", "Video", "Combine image, narration, and movement to tell a story."),
+        ("🖱️", "Interactive", "Invite audiences to explore, navigate, and participate."),
+    ]
+    cols = st.columns(4)
+    for i, (col, (icon, title, description)) in enumerate(zip(cols, formats)):
+        with col:
+            with card(f"about-format-{i}"):
+                st.markdown(f'<div class="format-icon" aria-hidden="true">{icon}</div><h3 class="res-title">{title}</h3>', unsafe_allow_html=True)
+                st.write(description)
+
+    # Our Story and Mission
+    st.header("Our story and mission")
+    st.write("We are building a welcoming starting point for multimodal teaching and making: useful resources, examples, and guidance in one place.")
+    milestones = [
+        ("The idea", "Make multimodal teaching resources easier to find and use."),
+        ("The collection", "Bring together guides, activities, exemplars, lesson plans, and rubrics."),
+        ("What comes next", "Keep growing the library with the needs of learners and instructors in mind."),
+    ]
+    cols = st.columns(3)
+    for i, (col, (heading, description)) in enumerate(zip(cols, milestones), start=1):
+        with col:
+            with card(f"about-milestone-{i}"):
+                st.markdown(f'<div class="about-timeline"><h3>{heading}</h3><p>{description}</p></div>', unsafe_allow_html=True)
+
+    # Meet the Team. Replace names, bios, and photo paths with your team details.
+    st.header("Meet the team")
+    team = [
+        {"name": "Team Member Name", "role": "Multimodal Learning",
+         "bio": "Supports learning design across written, visual, audio, and video projects.",
+         "photo": "assets/team-member-1.jpg"},
+        {"name": "Team Member Name", "role": "Digital Media",
+         "bio": "Helps learners plan, produce, and revise digital media for real audiences.",
+         "photo": "assets/team-member-2.jpg"},
+        {"name": "Team Member Name", "role": "Accessibility and Inclusion",
+         "bio": "Focuses on making multimodal resources clear, usable, and accessible.",
+         "photo": "assets/team-member-3.jpg"},
+    ]
+    cols = st.columns(len(team))
+    for i, (col, member) in enumerate(zip(cols, team), start=1):
+        with col:
+            with card(f"about-team-{i}"):
+                photo = Path(member["photo"])
+                if photo.is_file():
+                    st.image(str(photo), use_container_width=True)
+                else:
+                    initials = "".join(part[0] for part in member["name"].split()[:2]).upper()
+                    st.markdown(f'<div class="team-photo-fallback" role="img" aria-label="Photo placeholder for {esc(member["name"])}">{initials}</div>', unsafe_allow_html=True)
+                st.markdown(f'<h3 class="res-title">{esc(member["name"])}</h3>', unsafe_allow_html=True)
+                st.caption(member["role"])
+                st.write(member["bio"])
+
+    # Call to Action
+    st.divider()
+    with panel("about-cta"):
+        st.header("Ready to explore?")
+        st.write("Find a resource for your next project, course, or creative idea.")
+        st.button("Explore the Resource Library", key="about_library", type="primary",
+                  on_click=go_to, args=("Search Resources",))
+
+
 # --- Search page helpers: callbacks run before the page reruns, so they can set widget values ---
 def set_query(term):
     """Suggestion and history buttons: put a term in the search box."""
@@ -1031,6 +1143,7 @@ PAGES = {
     "Browse Exemplars": page_exemplars,
     "Lesson Plans": page_lessons,
     "Rubrics": page_rubrics,
+    "About": page_about,
 }
 
 
