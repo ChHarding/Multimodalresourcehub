@@ -1230,7 +1230,7 @@ def show_welcome_splash():
         )
 
     countdown = st.empty()
-    for seconds_left in range(10, 0, -1):
+    for seconds_left in range(5, 0, -1):
         countdown.caption(f"Continuing to sign in in {seconds_left} seconds…")
         time.sleep(1)
     countdown.empty()
