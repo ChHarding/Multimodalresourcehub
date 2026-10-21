@@ -128,6 +128,10 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 .notice { border-radius: 12px; padding: var(--s4) var(--s5); margin: var(--s3) 0; background: #FFF1EF; border: 1px solid #FFC9C2; border-left: 6px solid var(--coral); color: var(--ink); line-height: 1.55; }
 .notice.success { background: #E8F7F5; border-color: #B5E4DF; border-left-color: var(--teal); }
 
+/* Show a hand cursor on interactive controls; keep the default cursor over ordinary text */
+.stApp button, .stApp a, .stApp [role="button"], .stApp input[type="checkbox"],
+.stApp input[type="radio"], .stApp select, .stApp summary { cursor: pointer !important; }
+
 /* Visible keyboard focus */
 .stApp button:focus-visible, .stApp input:focus-visible, .stApp a:focus-visible, .stApp [role="combobox"]:focus-visible, .stApp summary:focus-visible, .stApp label:has(input:focus-visible) { outline: 3px solid var(--plum) !important; outline-offset: 3px; }
 
