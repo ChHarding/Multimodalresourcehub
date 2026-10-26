@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+  auth_data/
+.streamlit/secrets.toml
+
+#user data
+data/users.db
