@@ -564,6 +564,16 @@ def render_auth_page():
     tab_login, tab_signup = st.tabs(["Log in", "Sign up"])
     with tab_login:
         render_login_form()
+        if st.button("🔑 Forgot Password?", key="forgot_password"):
+            st.info(
+                "Password resets are handled by the site administrator. "
+                "Use the contact button below to request a reset."
+            )
+        st.link_button(
+            "✉️ Contact the Site Administrator",
+            "mailto:ewuoso@iastate.edu?subject=Multimodal%20Studio%20Hub%20password%20reset",
+            help="Email ewuoso@iastate.edu for account or password help.",
+        )
     with tab_signup:
         render_signup_form()
 
