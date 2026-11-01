@@ -1221,12 +1221,79 @@ def lesson_plan_to_pdf(plan):
     return bytes(pdf.output())
 
 
+def lesson_plan_to_docx(plan):
+    """Create an editable Word document for one lesson plan."""
+    from docx import Document
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.shared import Inches, Pt, RGBColor
+
+    doc = Document()
+    section = doc.sections[0]
+    section.top_margin = Inches(0.7)
+    section.bottom_margin = Inches(0.7)
+    section.left_margin = Inches(0.8)
+    section.right_margin = Inches(0.8)
+
+    title = doc.add_heading(plan["title"], level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    for run in title.runs:
+        run.font.color.rgb = RGBColor(45, 30, 79)
+
+    meta = doc.add_paragraph()
+    meta_run = meta.add_run(
+        f'Genre: {plan["genre"]}  |  Course level: {plan["level"]}  |  '
+        f'Duration: {plan["duration_min"]} minutes'
+    )
+    meta_run.bold = True
+    meta_run.font.color.rgb = RGBColor(75, 58, 122)
+
+    def add_section(heading, body=None, items=None, numbered=False):
+        doc.add_heading(heading, level=1)
+        if body:
+            doc.add_paragraph(body)
+        if items:
+            style = "List Number" if numbered else "List Bullet"
+            for item in items:
+                doc.add_paragraph(str(item), style=style)
+
+    add_section("Description", body=plan["description"])
+    add_section("Learning objectives", items=plan["objectives"], numbered=True)
+    add_section("Preparation", body=plan["prep"])
+    add_section("Materials", items=plan["materials"])
+
+    doc.add_heading("Timeline", level=1)
+    table = doc.add_table(rows=1, cols=2)
+    table.style = "Light Shading Accent 1"
+    table.rows[0].cells[0].text = "Time"
+    table.rows[0].cells[1].text = "Activity"
+    start = 0
+    for minutes, activity in plan["timeline"]:
+        cells = table.add_row().cells
+        cells[0].text = f"{start}-{start + minutes} min"
+        cells[1].text = str(activity)
+        start += minutes
+
+    add_section("Assessment", body=plan["assessment"])
+    note = doc.add_paragraph(
+        "Sample plan from Multimodal Studio Hub. Adapt it freely for your course."
+    )
+    for run in note.runs:
+        run.italic = True
+        run.font.size = Pt(9)
+        run.font.color.rgb = RGBColor(90, 81, 112)
+
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    return buffer.getvalue()
+
+
 def plans_to_zip(plans):
-    """Bundle several lesson-plan PDFs into one zip file, held in memory."""
+    """Bundle PDF and editable Word versions of each lesson plan into one zip."""
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         for plan in plans:
             archive.writestr(f'{plan["id"]}.pdf', lesson_plan_to_pdf(plan))
+            archive.writestr(f'{plan["id"]}.docx', lesson_plan_to_docx(plan))
     return buffer.getvalue()
 
 
@@ -1265,8 +1332,18 @@ def render_plan_card(plan):
             st.write(plan["assessment"])
         # Downloads are an instructor tool; everyone else can still preview the plan above
         if auth.has_instructor_access(auth.current_user()):
-            st.download_button(f'Download {plan["title"]} (PDF)', data=lesson_plan_to_pdf(plan), file_name=f'{plan["id"]}.pdf',
-                               mime="application/pdf", key=f'dl_{plan["id"]}', help="Downloads a print-ready PDF copy", type="primary")
+            try:
+                pdf_bytes = lesson_plan_to_pdf(plan)
+                docx_bytes = lesson_plan_to_docx(plan)
+            except ImportError:
+                notice("PDF and Word downloads need the fpdf2 and python-docx packages. Add both to requirements.txt.", "alert", "alert")
+                return
+            pdf_col, word_col = st.columns(2)
+            pdf_col.download_button(f'Download {plan["title"]} (PDF)', data=pdf_bytes, file_name=f'{plan["id"]}.pdf',
+                                    mime="application/pdf", key=f'dl_pdf_{plan["id"]}', help="Downloads a print-ready PDF copy", type="primary")
+            word_col.download_button(f'Download {plan["title"]} (Word)', data=docx_bytes, file_name=f'{plan["id"]}.docx',
+                                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                     key=f'dl_docx_{plan["id"]}', help="Editable in Word or Google Docs", type="primary")
         render_related_resources("lesson", plan["genre"], plan["title"])
 
 
@@ -1318,8 +1395,8 @@ def page_lessons():
     if plans:
         if auth.has_instructor_access(auth.current_user()):
             # One download for everything currently shown, then the preview cards
-            st.download_button(f"Download all {len(plans)} shown (PDFs in ZIP)", data=plans_to_zip(plans), file_name="lesson-plans-pdf.zip",
-                               mime="application/zip", key="lp_zip", help="One PDF per lesson plan, bundled in a zip", type="primary")
+            st.download_button(f"Download all {len(plans)} shown (PDF + Word ZIP)", data=plans_to_zip(plans), file_name="lesson-plans-pdf-and-word.zip",
+                               mime="application/zip", key="lp_zip", help="PDF and editable Word files for each shown plan, bundled in a zip", type="primary")
         else:
             notice(lesson_download_message(auth.current_user()))
         card_grid(plans, render_plan_card)
