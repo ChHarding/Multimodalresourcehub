@@ -202,12 +202,12 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
   .hero.rubrics-hero, .st-key-rubrics-hero { background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/rubrics-hero.jpg"); background-position: center; min-height: 0; }
 }
 .hero.project-space-hero, .st-key-project-space-hero {
-  background: linear-gradient(90deg, rgba(22,33,62,.94) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.16) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/project-space-hero.jpg") center / cover no-repeat;
+  background: linear-gradient(90deg, rgba(22,33,62,.94) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.16) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/project-space-hero.jpg?v=4fc5044") center / cover no-repeat;
   min-height: 300px; border: 1px solid rgba(255,255,255,.24);
 }
 @media (max-width: 640px) {
   .hero.project-space-hero, .st-key-project-space-hero {
-    background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/project-space-hero.jpg");
+    background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/project-space-hero.jpg?v=4fc5044");
     background-position: center; min-height: 0;
   }
 }
