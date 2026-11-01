@@ -1580,6 +1580,11 @@ def page_rubrics():
 # The sidebar radio stores the current page in st.session_state["nav"];
 # PAGES maps each label to the function that draws it.
 # ---------------------------------------------------------------------------
+def page_project_space():
+    """Render collaborative projects for the current signed-in user."""
+    projects.render_projects_page(auth.current_user())
+
+
 PAGES = {
     "Home": page_home,
     "Search Resources": page_search,
@@ -1589,11 +1594,6 @@ PAGES = {
     "Rubrics": page_rubrics,
     "About": page_about,
 }
-
-
-def page_project_space():
-    """Render collaborative projects for the current signed-in user."""
-    projects.render_projects_page(auth.current_user())
 
 
 def render_copyright_footer():
