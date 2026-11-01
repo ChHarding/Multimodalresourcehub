@@ -1161,9 +1161,14 @@ def lesson_plan_to_pdf(plan):
     pdf.set_author("The Multimodal Studio Hub")
     pdf.add_page()
 
+    def write_text(text, line_height):
+        # multi_cell defaults to moving the cursor to the right edge; reset it
+        # after every block so the next block has the full printable width.
+        pdf.multi_cell(0, line_height, latin(text), new_x="LMARGIN", new_y="NEXT")
+
     pdf.set_text_color(45, 30, 79)
     pdf.set_font("Helvetica", "B", 19)
-    pdf.multi_cell(0, 9, latin(plan["title"]))
+    write_text(plan["title"], 9)
     pdf.set_draw_color(31, 163, 154)
     pdf.set_line_width(1.2)
     y = pdf.get_y() + 1
@@ -1172,10 +1177,11 @@ def lesson_plan_to_pdf(plan):
 
     pdf.set_text_color(75, 58, 122)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.multi_cell(0, 6, latin(
+    write_text(
         f'Genre: {plan["genre"]}   |   Course level: {plan["level"]}   |   '
-        f'Duration: {plan["duration_min"]} minutes'
-    ))
+        f'Duration: {plan["duration_min"]} minutes',
+        6,
+    )
     pdf.ln(3)
 
     def section(heading, body=None, items=None):
@@ -1185,11 +1191,11 @@ def lesson_plan_to_pdf(plan):
         pdf.set_text_color(35, 31, 42)
         pdf.set_font("Helvetica", "", 10)
         if body:
-            pdf.multi_cell(0, 5.5, latin(body))
+            write_text(body, 5.5)
         if items:
             for index, item in enumerate(items, 1):
                 prefix = f"{index}. " if heading == "Learning objectives" else "- "
-                pdf.multi_cell(0, 5.5, latin(prefix + str(item)))
+                write_text(prefix + str(item), 5.5)
         pdf.ln(2)
 
     section("Description", body=plan["description"])
@@ -1204,14 +1210,14 @@ def lesson_plan_to_pdf(plan):
     pdf.set_font("Helvetica", "", 10)
     start = 0
     for minutes, activity in plan["timeline"]:
-        pdf.multi_cell(0, 5.5, latin(f"{start}-{start + minutes} min: {activity}"))
+        write_text(f"{start}-{start + minutes} min: {activity}", 5.5)
         start += minutes
     pdf.ln(2)
 
     section("Assessment", body=plan["assessment"])
     pdf.set_text_color(90, 81, 112)
     pdf.set_font("Helvetica", "I", 8)
-    pdf.multi_cell(0, 4, "Sample plan from Multimodal Studio Hub. Adapt it freely for your course.")
+    write_text("Sample plan from Multimodal Studio Hub. Adapt it freely for your course.", 4)
     return bytes(pdf.output())
 
 
