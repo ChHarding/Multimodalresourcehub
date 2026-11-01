@@ -265,7 +265,8 @@ def list_projects(user_id):
             "SELECT p.*, m.role, (SELECT COUNT(*) FROM members WHERE project_id = p.id) AS member_count, "
             "(SELECT MAX(created_at) FROM activity WHERE project_id = p.id) AS last_active "
             "FROM projects p JOIN members m ON m.project_id = p.id WHERE m.user_id = ? "
-            "ORDER BY COALESCE(last_active, p.created_at) DESC", (user_id,)).fetchall()
+            "ORDER BY COALESCE((SELECT MAX(a2.created_at) FROM activity a2 WHERE a2.project_id = p.id), p.created_at) DESC",
+            (user_id,)).fetchall()
 
 
 def list_members(project_id):
