@@ -470,10 +470,19 @@ def render_login_form():
     with st.form("login_form"):
         user_id = st.text_input("User ID", key="li_user_id", autocomplete="username")
         password = st.text_input("Password", type="password", key="li_password", autocomplete="current-password")
-        submitted = st.form_submit_button("Log in", type="primary")
+        login_col, forgot_col = st.columns(2)
+        with login_col:
+            submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
+        with forgot_col:
+            forgot_clicked = st.form_submit_button("🔑 Forgot Password?", use_container_width=True)
+
+    if forgot_clicked:
+        st.session_state["forgot_password_open"] = True
+        return
     if not submitted:
         return
 
+    st.session_state["forgot_password_open"] = False
     user, status = authenticate(user_id, password)
     if status == "ok":
         log_in(user["id"])
@@ -564,16 +573,16 @@ def render_auth_page():
     tab_login, tab_signup = st.tabs(["Log in", "Sign up"])
     with tab_login:
         render_login_form()
-        if st.button("🔑 Forgot Password?", key="forgot_password"):
+        if st.session_state.get("forgot_password_open", False):
             st.info(
                 "Password resets are handled by the site administrator. "
                 "Use the contact button below to request a reset."
             )
-        st.link_button(
-            "✉️ Contact the Site Administrator",
-            "mailto:ewuoso@iastate.edu?subject=Multimodal%20Studio%20Hub%20password%20reset",
-            help="Email ewuoso@iastate.edu for account or password help.",
-        )
+            st.link_button(
+                "✉️ Contact the Site Administrator",
+                "mailto:ewuoso@iastate.edu?subject=Multimodal%20Studio%20Hub%20password%20reset",
+                help="Email ewuoso@iastate.edu for account or password help.",
+            )
     with tab_signup:
         render_signup_form()
 
