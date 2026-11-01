@@ -392,22 +392,21 @@ RESOURCES = [
 
 READING_RECOMMENDATIONS = [
     {
-        "title": "Books",
-        "description": "Recommended books for multimodal teaching and learning.",
-        "tags": ["books", "reading"],
-        "pdf": "assets/recommendations/books.pdf",
-    },
-    {
-        "title": "Articles",
-        "description": "Selected articles about multimodal projects and instruction.",
-        "tags": ["articles", "research"],
-        "pdf": "assets/recommendations/articles.pdf",
+        "title": "Books and Articles",
+        "description": "Recommended books and selected articles about multimodal teaching and learning.",
+        "tags": ["books", "articles", "research"],
+        "documents": [
+            {"title": "Books", "pdf": "assets/recommendations/books.pdf"},
+            {"title": "Articles", "pdf": "assets/recommendations/articles.pdf"},
+        ],
     },
     {
         "title": "Videos",
         "description": "Recommended videos for exploring multimodal ideas and practices.",
         "tags": ["videos", "media"],
-        "pdf": "assets/recommendations/videos.pdf",
+        "documents": [
+            {"title": "Videos", "pdf": "assets/recommendations/videos.pdf"},
+        ],
     },
 ]
 
@@ -783,7 +782,7 @@ def search_resources(resources, query, genre):
 
 
 def render_recommendation_card(item):
-    """Card for a reading recommendation and its downloadable PDF."""
+    """Card for recommendations with a separate PDF slot for each document."""
     with card(f'recommendation-{slug(item["title"])}'):
         st.markdown(
             '<span class="badge">Recommendation</span> '
@@ -803,19 +802,21 @@ def render_recommendation_card(item):
         with st.expander("View details"):
             st.write(item["description"])
 
-        pdf_path = Path(__file__).resolve().parent / item["pdf"]
-        with st.expander("PDF document"):
-            if pdf_path.is_file():
-                st.download_button(
-                    f'Download {item["title"]} PDF',
-                    data=pdf_path.read_bytes(),
-                    file_name=pdf_path.name,
-                    mime="application/pdf",
-                    key=f'recommendation_pdf_{slug(item["title"])}',
-                    type="primary",
-                )
-            else:
-                st.info(f"Add the PDF file at: {item['pdf']}")
+        with st.expander("PDF documents"):
+            for document in item["documents"]:
+                st.markdown(f'**{esc(document["title"])}**')
+                pdf_path = Path(__file__).resolve().parent / document["pdf"]
+                if pdf_path.is_file():
+                    st.download_button(
+                        f'Download {document["title"]} PDF',
+                        data=pdf_path.read_bytes(),
+                        file_name=pdf_path.name,
+                        mime="application/pdf",
+                        key=f'recommendation_pdf_{slug(item["title"])}_{slug(document["title"])}',
+                        type="primary",
+                    )
+                else:
+                    st.caption(f'Add the PDF file at: {document["pdf"]}')
 
 
 def render_resource_card(r):
