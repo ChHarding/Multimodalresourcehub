@@ -24,6 +24,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 import auth  # accounts: sign up, log in, roles, and the onboarding tutorial (auth.py, same folder)
+import projects  # collaborative project spaces and share links (projects.py, same folder)
 
 # ---------------------------------------------------------------------------
 # 1. PAGE CONFIGURATION
@@ -1583,10 +1584,16 @@ PAGES = {
     "Home": page_home,
     "Search Resources": page_search,
     "Browse Exemplars": page_exemplars,
+    "Project Space": page_project_space,
     "Lesson Plans": page_lessons,
     "Rubrics": page_rubrics,
     "About": page_about,
 }
+
+
+def page_project_space():
+    """Render collaborative projects for the current signed-in user."""
+    projects.render_projects_page(auth.current_user())
 
 
 def render_copyright_footer():
@@ -1657,6 +1664,9 @@ def main():
     st.markdown(CSS, unsafe_allow_html=True)
     st.session_state.setdefault("nav", "Home")
 
+    # A read-only project share link may be viewed without signing in.
+    projects.handle_shared_link()
+
     if not auth.current_user() and not st.session_state.get("welcome_splash_shown"):
         show_welcome_splash()
         st.stop()
@@ -1673,6 +1683,7 @@ def main():
     # Accounts: signed-out visitors see sign up / log in, new users see the tutorial, and the script
     # stops inside this call until they are done. Everything below runs only for signed-in users.
     user = auth.require_login()
+    projects.redeem_pending_share(user)
 
     with st.sidebar:
         auth.render_account_sidebar(user)  # name, role, replay tutorial, log out
