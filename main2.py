@@ -214,9 +214,12 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 .stApp h1.hero-title { font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3rem) !important; line-height: 1.12; color: #FFFFFF !important; max-width: 20ch; margin: 0 0 var(--s3); padding: 0; }
 .hero p { color: #E6DFF5 !important; font-size: 1.05rem; max-width: 56ch; margin: 0; }
 .st-key-search-resources-hero, .st-key-browse-exemplars-hero,
-.st-key-lesson-plans-hero, .st-key-rubrics-hero {
+.st-key-lesson-plans-hero, .st-key-rubrics-hero, .st-key-project-space-hero {
   border-radius: 20px; padding: clamp(24px, 5vw, 56px); margin-bottom: var(--s4);
   display: flex; flex-direction: column; justify-content: center;
+}
+.st-key-project-space-hero p {
+  color: #E6DFF5 !important; font-size: 1.05rem; max-width: 56ch; margin: 0;
 }
 .st-key-search-resources-hero h1, .st-key-browse-exemplars-hero h1,
 .st-key-lesson-plans-hero h1, .st-key-rubrics-hero h1 {
