@@ -486,12 +486,13 @@ def render_login_form():
     user, status = authenticate(user_id, password)
     if status == "ok":
         log_in(user["id"])
+        st.session_state["login_notice"] = "Login successful 👍"
         st.rerun()
     elif status == "locked":
         minutes = max(1, int((user["locked_until"] - time.time()) // 60) + 1)
-        st.error(f"Too many failed attempts. Please try again in about {minutes} minutes.")
+        st.error(f"Too many failed attempts. Please try again in about {minutes} minutes. 👎")
     else:
-        st.error("Incorrect user ID or password.")
+        st.error("Incorrect user ID or password. 👎")
 
 
 def render_auth_page():
@@ -620,6 +621,9 @@ def require_login():
         st.error("Account storage is unavailable. Please try again later or contact the site administrator.")
         st.stop()
     user = current_user()
+    notice = st.session_state.pop("login_notice", None)
+    if notice:
+        st.success(notice)
     if not user:
         render_auth_page()
         st.stop()
