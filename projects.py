@@ -455,7 +455,7 @@ def contribution_totals(project_id):
             "COUNT(a.id) AS total, MAX(a.created_at) AS last_active "
             "FROM members m JOIN users u ON u.id = m.user_id "
             "LEFT JOIN activity a ON a.user_id = m.user_id AND a.project_id = m.project_id "
-            "WHERE m.project_id = ? GROUP BY m.user_id, u.user_id ORDER BY total DESC, u.user_id", (project_id,)).fetchall()
+            "WHERE m.project_id = ? GROUP BY m.user_id, u.user_id, m.role ORDER BY total DESC, u.user_id", (project_id,)).fetchall()
 
 
 # ---------------------------------------------------------------------------
