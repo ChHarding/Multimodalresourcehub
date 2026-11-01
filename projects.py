@@ -944,7 +944,13 @@ def render_viewer_mode(link):
 def render_projects_page(user):
     """The body of the Project Spaces sidebar page."""
     init_db()
-    st.title("Project Space")
+    st.markdown(
+        '<section class="hero project-space-hero" aria-label="Project Space introduction">'
+        '<h1 class="hero-title">Project Space</h1>'
+        '<p>Build a multimodal page with your team, share it, and see who contributed what.</p>'
+        '</section>',
+        unsafe_allow_html=True,
+    )
     pid = st.session_state.get("open_project")
     if pid:
         project, role = get_project(pid), get_role(pid, user["id"])
@@ -953,7 +959,6 @@ def render_projects_page(user):
             return
         st.session_state.pop("open_project", None)
         st.warning("That project is not available to you anymore.")
-    st.write("Build a multimodal page with your team, share it, and see who contributed what.")
     render_project_list(user)
 
 
