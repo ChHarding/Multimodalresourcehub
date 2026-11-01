@@ -944,13 +944,12 @@ def render_viewer_mode(link):
 def render_projects_page(user):
     """The body of the Project Spaces sidebar page."""
     init_db()
-    st.markdown(
-        '<section class="hero project-space-hero" aria-label="Project Space introduction">'
-        '<h1 class="hero-title">Project Space</h1>'
-        '<p>Build a multimodal page with your team, share it, and see who contributed what.</p>'
-        '</section>',
-        unsafe_allow_html=True,
-    )
+    with st.container(key="project-space-hero"):
+        st.markdown('<h1 class="hero-title">Project Space</h1>', unsafe_allow_html=True)
+        st.markdown(
+            "<p>Build a multimodal page with your team, share it, and see who contributed what.</p>",
+            unsafe_allow_html=True,
+        )
     pid = st.session_state.get("open_project")
     if pid:
         project, role = get_project(pid), get_role(pid, user["id"])
