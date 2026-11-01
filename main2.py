@@ -390,6 +390,27 @@ RESOURCES = [
      "classroom_use": "Attach to the assignment sheet so expectations are clear before work begins."},
 ]
 
+READING_RECOMMENDATIONS = [
+    {
+        "title": "Books",
+        "description": "Recommended books for multimodal teaching and learning.",
+        "tags": ["books", "reading"],
+        "pdf": "assets/recommendations/books.pdf",
+    },
+    {
+        "title": "Articles",
+        "description": "Selected articles about multimodal projects and instruction.",
+        "tags": ["articles", "research"],
+        "pdf": "assets/recommendations/articles.pdf",
+    },
+    {
+        "title": "Videos",
+        "description": "Recommended videos for exploring multimodal ideas and practices.",
+        "tags": ["videos", "media"],
+        "pdf": "assets/recommendations/videos.pdf",
+    },
+]
+
 # Genres for the filter menu are built from the data, so new genres appear automatically
 GENRES = sorted({r["genre"] for r in RESOURCES})
 
@@ -761,6 +782,42 @@ def search_resources(resources, query, genre):
     return [r for _, r in scored]
 
 
+def render_recommendation_card(item):
+    """Card for a reading recommendation and its downloadable PDF."""
+    with card(f'recommendation-{slug(item["title"])}'):
+        st.markdown(
+            '<span class="badge">Recommendation</span> '
+            '<span class="badge success">PDF</span>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f'<h3 class="res-title">{esc(item["title"])}</h3>',
+            unsafe_allow_html=True,
+        )
+        st.write(item["description"])
+        st.markdown(
+            "".join(f'<span class="pill">{esc(tag)}</span>' for tag in item["tags"]),
+            unsafe_allow_html=True,
+        )
+
+        with st.expander("View details"):
+            st.write(item["description"])
+
+        pdf_path = Path(__file__).resolve().parent / item["pdf"]
+        with st.expander("PDF document"):
+            if pdf_path.is_file():
+                st.download_button(
+                    f'Download {item["title"]} PDF',
+                    data=pdf_path.read_bytes(),
+                    file_name=pdf_path.name,
+                    mime="application/pdf",
+                    key=f'recommendation_pdf_{slug(item["title"])}',
+                    type="primary",
+                )
+            else:
+                st.info(f"Add the PDF file at: {item['pdf']}")
+
+
 def render_resource_card(r):
     """Bordered card: genre badge, title, description, tags, and an expander for details."""
     color = MODALITY_COLORS.get(r["modality"], "#16807A")
@@ -1108,6 +1165,10 @@ def page_search():
         st.header("Featured resources")
         st.write(f"Start with these picks, or type a keyword or choose a genre to explore all {len(RESOURCES)} resources.")
         card_grid([r for r in RESOURCES if r.get("featured")], render_resource_card)
+
+        st.header("Reading and Other Recommendations")
+        st.write("Explore recommended books, articles, and videos.")
+        card_grid(READING_RECOMMENDATIONS, render_recommendation_card)
         return
 
     # Otherwise run the search; the count sits in a polite live region for screen readers
