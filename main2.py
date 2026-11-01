@@ -1150,29 +1150,77 @@ def page_exemplars():
             card_grid([e for e in shown if e["genre"] == genre], render_exemplar)
 
 
-def plan_to_text(plan):
-    """Turn one lesson plan into a plain-text file instructors can print or paste into a course site."""
-    lines = [plan["title"].upper(), "=" * len(plan["title"]), "",
-             f'Genre: {plan["genre"]}', f'Course level: {plan["level"]}', f'Duration: {plan["duration_min"]} minutes', "",
-             "DESCRIPTION", plan["description"], "", "LEARNING OBJECTIVES"]
-    lines += [f"{i}. {o}" for i, o in enumerate(plan["objectives"], 1)]
-    lines += ["", "MATERIALS"] + [f"- {m}" for m in plan["materials"]]
-    lines += ["", "PREPARATION", plan["prep"], "", "TIMELINE"]
+def lesson_plan_to_pdf(plan):
+    """Create a print-ready PDF for one lesson plan."""
+    from fpdf import FPDF
+
+    pdf = FPDF(orientation="P", unit="mm", format="Letter")
+    pdf.set_margins(18, 18, 18)
+    pdf.set_auto_page_break(auto=True, margin=18)
+    pdf.set_title(plan["title"])
+    pdf.set_author("The Multimodal Studio Hub")
+    pdf.add_page()
+
+    pdf.set_text_color(45, 30, 79)
+    pdf.set_font("Helvetica", "B", 19)
+    pdf.multi_cell(0, 9, latin(plan["title"]))
+    pdf.set_draw_color(31, 163, 154)
+    pdf.set_line_width(1.2)
+    y = pdf.get_y() + 1
+    pdf.line(18, y, 194, y)
+    pdf.ln(5)
+
+    pdf.set_text_color(75, 58, 122)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.multi_cell(0, 6, latin(
+        f'Genre: {plan["genre"]}   |   Course level: {plan["level"]}   |   '
+        f'Duration: {plan["duration_min"]} minutes'
+    ))
+    pdf.ln(3)
+
+    def section(heading, body=None, items=None):
+        pdf.set_text_color(45, 30, 79)
+        pdf.set_font("Helvetica", "B", 12)
+        pdf.cell(0, 8, latin(heading), new_x="LMARGIN", new_y="NEXT")
+        pdf.set_text_color(35, 31, 42)
+        pdf.set_font("Helvetica", "", 10)
+        if body:
+            pdf.multi_cell(0, 5.5, latin(body))
+        if items:
+            for index, item in enumerate(items, 1):
+                prefix = f"{index}. " if heading == "Learning objectives" else "- "
+                pdf.multi_cell(0, 5.5, latin(prefix + str(item)))
+        pdf.ln(2)
+
+    section("Description", body=plan["description"])
+    section("Learning objectives", items=plan["objectives"])
+    section("Preparation", body=plan["prep"])
+    section("Materials", items=plan["materials"])
+
+    pdf.set_text_color(45, 30, 79)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 8, "Timeline", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_text_color(35, 31, 42)
+    pdf.set_font("Helvetica", "", 10)
     start = 0
     for minutes, activity in plan["timeline"]:
-        lines.append(f"{start:>3}-{start + minutes:<3} min  {activity}")
+        pdf.multi_cell(0, 5.5, latin(f"{start}-{start + minutes} min: {activity}"))
         start += minutes
-    lines += ["", "ASSESSMENT", plan["assessment"], "", "-" * 40,
-              "Sample plan from Multimodal Studio Hub. Adapt it freely for your course."]
-    return "\n".join(lines) + "\n"
+    pdf.ln(2)
+
+    section("Assessment", body=plan["assessment"])
+    pdf.set_text_color(90, 81, 112)
+    pdf.set_font("Helvetica", "I", 8)
+    pdf.multi_cell(0, 4, "Sample plan from Multimodal Studio Hub. Adapt it freely for your course.")
+    return bytes(pdf.output())
 
 
 def plans_to_zip(plans):
-    """Bundle several plans into one zip file (one text file per plan), held in memory."""
+    """Bundle several lesson-plan PDFs into one zip file, held in memory."""
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         for plan in plans:
-            archive.writestr(f'{plan["id"]}.txt', plan_to_text(plan))
+            archive.writestr(f'{plan["id"]}.pdf', lesson_plan_to_pdf(plan))
     return buffer.getvalue()
 
 
@@ -1211,8 +1259,8 @@ def render_plan_card(plan):
             st.write(plan["assessment"])
         # Downloads are an instructor tool; everyone else can still preview the plan above
         if auth.has_instructor_access(auth.current_user()):
-            st.download_button(f'Download {plan["title"]} (.txt)', data=plan_to_text(plan), file_name=f'{plan["id"]}.txt',
-                               mime="text/plain", key=f'dl_{plan["id"]}', help="Saves a plain-text copy you can edit", type="primary")
+            st.download_button(f'Download {plan["title"]} (PDF)', data=lesson_plan_to_pdf(plan), file_name=f'{plan["id"]}.pdf',
+                               mime="application/pdf", key=f'dl_{plan["id"]}', help="Downloads a print-ready PDF copy", type="primary")
         render_related_resources("lesson", plan["genre"], plan["title"])
 
 
@@ -1264,8 +1312,8 @@ def page_lessons():
     if plans:
         if auth.has_instructor_access(auth.current_user()):
             # One download for everything currently shown, then the preview cards
-            st.download_button(f"Download all {len(plans)} shown (.zip)", data=plans_to_zip(plans), file_name="lesson-plans.zip",
-                               mime="application/zip", key="lp_zip", help="One text file per plan, bundled in a zip", type="primary")
+            st.download_button(f"Download all {len(plans)} shown (PDFs in ZIP)", data=plans_to_zip(plans), file_name="lesson-plans-pdf.zip",
+                               mime="application/zip", key="lp_zip", help="One PDF per lesson plan, bundled in a zip", type="primary")
         else:
             notice(lesson_download_message(auth.current_user()))
         card_grid(plans, render_plan_card)
