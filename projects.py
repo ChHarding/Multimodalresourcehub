@@ -277,7 +277,7 @@ def list_members(project_id):
 
 
 def _manager_count(conn, project_id):
-    return _execute(conn, "SELECT COUNT(*) FROM members WHERE project_id = ? AND role = 'manage'", (project_id,)).fetchone()[0]
+    return _execute(conn, "SELECT COUNT(*) AS manager_count FROM members WHERE project_id = ? AND role = 'manage'", (project_id,)).fetchone()["manager_count"]
 
 
 def add_member_by_user_id(project_id, actor, user_id, role):
@@ -337,7 +337,7 @@ def add_block(project_id, user, kind, content):
     _require(project_id, user, "edit")
     now = time.time()
     with auth.db() as conn:
-        pos = _execute(conn, "SELECT COALESCE(MAX(position), 0) + 1 FROM blocks WHERE project_id = ?", (project_id,)).fetchone()[0]
+        pos = _execute(conn, "SELECT COALESCE(MAX(position), 0) + 1 AS next_position FROM blocks WHERE project_id = ?", (project_id,)).fetchone()["next_position"]
         _execute(conn, "INSERT INTO blocks (project_id, position, kind, content, created_by, updated_by, created_at, updated_at) "
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (project_id, pos, kind, json.dumps(content), user["id"], user["id"], now, now))
         _log(conn, project_id, user["id"], "added_block", block_label(kind, content))
