@@ -330,8 +330,10 @@ def log_in(user_pk):
 
 
 def logout():
-    """Clear the session and show a goodbye message after the rerun."""
+    """Clear the session, return to sign-in, and show a goodbye message."""
     st.session_state.clear()
+    # Skip the welcome splash so require_login() can display the goodbye message.
+    st.session_state["welcome_splash_shown"] = True
     st.session_state["logout_notice"] = "See you later! 🖖"
 
 
