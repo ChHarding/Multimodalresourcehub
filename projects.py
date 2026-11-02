@@ -679,6 +679,7 @@ def render_edit_tab(project, user):
     n = st.session_state.setdefault(f"addn_{pid}", 0)  # changing n gives the form fresh, empty fields
     kind = st.selectbox("Block type", list(BLOCK_KINDS), format_func=BLOCK_KINDS.get, key=f"newkind_{pid}")
     with st.form(f"add_form_{pid}"):
+        st.caption("Add content to your project page. Fields depend on the block type selected above.")
         raw = block_fields(kind, {}, f"add_{pid}_{n}_{kind}")
         submitted = st.form_submit_button("Add block", type="primary")
     if submitted:
@@ -756,9 +757,11 @@ def render_comments_tab(project, user, role):
     if can(role, "comment"):
         blocks = list_blocks(pid)
         with st.form(f"comment_form_{pid}", clear_on_submit=True):
+            st.caption("Choose the project or a specific block this comment is about.")
             about = st.selectbox("About", [None] + [b["id"] for b in blocks], key=f"cm_about_{pid}",
                                  format_func=lambda x: "The whole project" if x is None else block_label(
                                      next(b["kind"] for b in blocks if b["id"] == x), json.loads(next(b["content"] for b in blocks if b["id"] == x))))
+            st.caption("Write a comment for your team.")
             body = st.text_area("Your comment", max_chars=MAX_COMMENT, key=f"cm_body_{pid}")
             sent = st.form_submit_button("Post comment", type="primary")
         if sent:
@@ -792,7 +795,9 @@ def render_team_tab(project, user):
                     st.rerun()
                 st.error(message)
     with st.form(f"add_member_{pid}", clear_on_submit=True):
+        st.caption("Enter the user ID of a classmate who already has an account.")
         member_user_id = st.text_input("Add a classmate by user ID (they need an account)", key=f"am_user_id_{pid}")
+        st.caption("Choose what this team member can do in the project.")
         role = st.selectbox("Role", ROLES, index=2, format_func=ROLE_LABELS.get, key=f"am_role_{pid}")
         added = st.form_submit_button("Add to team")
     if added:
@@ -845,8 +850,10 @@ def share_dialog(project_id):
         st.error("Only managers can share a project.")
         return
     st.markdown("**Invite link**")
+    st.caption("Choose the access level granted by the invite link.")
     role = st.selectbox("Permission", LINK_ROLES, format_func=lambda r: f"{ROLE_LABELS[r]}: {ROLE_HELP[r]}", key="sd_role")
     today = date.today()
+    st.caption("Choose when the invite link should expire.")
     expiry = st.date_input("Link expires on", value=today + timedelta(days=14), min_value=today + timedelta(days=1),
                            max_value=today + timedelta(days=90), key="sd_expiry")
     if st.button("Create invite link", type="primary", key="sd_create"):
