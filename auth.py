@@ -434,12 +434,41 @@ def render_copyright_footer():
 # ---------------------------------------------------------------------------
 def render_signup_form():
     with st.form("signup_form"):
-        user_id = st.text_input(
-            "Choose a user ID", key="su_user_id", autocomplete="username",
-            help=f"{MIN_USER_ID_LENGTH}–{MAX_USER_ID_LENGTH} characters: letters, numbers, periods, underscores, or hyphens.",
+        st.markdown("**Choose a user ID**")
+        st.caption(
+            f"{MIN_USER_ID_LENGTH}–{MAX_USER_ID_LENGTH} characters. "
+            "Use letters, numbers, periods, underscores, or hyphens; "
+            "start with a letter or number."
         )
-        password = st.text_input("Password", type="password", key="su_password", autocomplete="new-password")
-        role_label = st.radio("I am a", list(ROLES.values()), horizontal=True, key="su_role")
+        user_id = st.text_input(
+            "Choose a user ID",
+            key="su_user_id",
+            autocomplete="username",
+            label_visibility="collapsed",
+        )
+
+        st.markdown("**Password**")
+        st.caption(
+            f"Use {MIN_PASSWORD_LENGTH}–{MAX_PASSWORD_LENGTH} characters. "
+            "Avoid common passwords and don’t include your user ID."
+        )
+        password = st.text_input(
+            "Password",
+            type="password",
+            key="su_password",
+            autocomplete="new-password",
+            label_visibility="collapsed",
+        )
+
+        st.markdown("**Account type**")
+        st.caption("Choose Student or Instructor.")
+        role_label = st.radio(
+            "I am a",
+            list(ROLES.values()),
+            horizontal=True,
+            key="su_role",
+            label_visibility="collapsed",
+        )
         submitted = st.form_submit_button("Create account", type="primary")
     if not submitted:
         return
@@ -471,8 +500,25 @@ def render_signup_form():
 
 def render_login_form():
     with st.form("login_form"):
-        user_id = st.text_input("User ID", key="li_user_id", autocomplete="username")
-        password = st.text_input("Password", type="password", key="li_password", autocomplete="current-password")
+        st.markdown("**User ID**")
+        st.caption("Enter the user ID you chose when you created your account.")
+        user_id = st.text_input(
+            "User ID",
+            key="li_user_id",
+            autocomplete="username",
+            label_visibility="collapsed",
+        )
+
+        st.markdown("**Password**")
+        st.caption("Enter your account password.")
+        password = st.text_input(
+            "Password",
+            type="password",
+            key="li_password",
+            autocomplete="current-password",
+            label_visibility="collapsed",
+        )
+
         login_col, forgot_col = st.columns(2)
         with login_col:
             submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
