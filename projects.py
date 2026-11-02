@@ -901,7 +901,9 @@ def render_project_list(user):
     projects = list_projects(user["id"])
     with st.expander("Create a new project", expanded=not projects):
         with st.form("new_project_form"):
+            st.caption("Enter a clear name for your project.")
             title = st.text_input("Project title", max_chars=MAX_TITLE, key="np_title")
+            st.caption("Briefly describe the project for your team. You can leave this blank.")
             description = st.text_area("Short description (optional)", max_chars=300, key="np_desc")
             created = st.form_submit_button("Create project", type="primary")
         if created:
