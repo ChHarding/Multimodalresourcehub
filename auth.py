@@ -489,7 +489,7 @@ def render_login_form():
     user, status = authenticate(user_id, password)
     if status == "ok":
         log_in(user["id"])
-        st.session_state["login_notice"] = "Login successful 👍"
+        st.session_state["login_notice"] = "Welcome Back! 👍"
         st.rerun()
     elif status == "locked":
         minutes = max(1, int((user["locked_until"] - time.time()) // 60) + 1)
