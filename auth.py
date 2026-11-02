@@ -330,8 +330,9 @@ def log_in(user_pk):
 
 
 def logout():
-    """Button callback that clears the current Streamlit session."""
+    """Clear the session and show a goodbye message after the rerun."""
     st.session_state.clear()
+    st.session_state["logout_notice"] = "See you later! 🖖"
 
 
 def complete_onboarding():
@@ -624,6 +625,9 @@ def require_login():
     notice = st.session_state.pop("login_notice", None)
     if notice:
         st.success(notice)
+    logout_notice = st.session_state.pop("logout_notice", None)
+    if logout_notice:
+        st.success(logout_notice)
     if not user:
         render_auth_page()
         st.stop()
