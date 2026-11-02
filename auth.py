@@ -434,9 +434,8 @@ def render_copyright_footer():
 # ---------------------------------------------------------------------------
 def render_signup_form():
     with st.form("signup_form"):
-        st.markdown("**Choose a user ID**")
         st.caption(
-            f"{MIN_USER_ID_LENGTH}–{MAX_USER_ID_LENGTH} characters. "
+            f"Choose {MIN_USER_ID_LENGTH}–{MAX_USER_ID_LENGTH} characters. "
             "Use letters, numbers, periods, underscores, or hyphens; "
             "start with a letter or number."
         )
@@ -444,10 +443,9 @@ def render_signup_form():
             "Choose a user ID",
             key="su_user_id",
             autocomplete="username",
-            label_visibility="collapsed",
+            label_visibility="visible",
         )
 
-        st.markdown("**Password**")
         st.caption(
             f"Use {MIN_PASSWORD_LENGTH}–{MAX_PASSWORD_LENGTH} characters. "
             "Avoid common passwords and don’t include your user ID."
@@ -457,17 +455,16 @@ def render_signup_form():
             type="password",
             key="su_password",
             autocomplete="new-password",
-            label_visibility="collapsed",
+            label_visibility="visible",
         )
 
-        st.markdown("**Account type**")
-        st.caption("Choose Student or Instructor.")
+        st.caption("Choose the role that best describes you.")
         role_label = st.radio(
-            "I am a",
+            "Account type",
             list(ROLES.values()),
             horizontal=True,
             key="su_role",
-            label_visibility="collapsed",
+            label_visibility="visible",
         )
         submitted = st.form_submit_button("Create account", type="primary")
     if not submitted:
@@ -500,23 +497,21 @@ def render_signup_form():
 
 def render_login_form():
     with st.form("login_form"):
-        st.markdown("**User ID**")
         st.caption("Enter the user ID you chose when you created your account.")
         user_id = st.text_input(
             "User ID",
             key="li_user_id",
             autocomplete="username",
-            label_visibility="collapsed",
+            label_visibility="visible",
         )
 
-        st.markdown("**Password**")
         st.caption("Enter your account password.")
         password = st.text_input(
             "Password",
             type="password",
             key="li_password",
             autocomplete="current-password",
-            label_visibility="collapsed",
+            label_visibility="visible",
         )
 
         login_col, forgot_col = st.columns(2)
