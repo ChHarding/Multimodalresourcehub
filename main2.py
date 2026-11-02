@@ -250,7 +250,7 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 .badge.recommendation-label {
   background: var(--lavender); color: var(--plum);
   font-family: 'Fraunces', Georgia, serif; font-size: 1.45rem;
-  font-weight: 700; line-height: 1.2; padding: 6px 14px;
+  font-weight: 700; line-height: 1.2; padding: 6px 14px 6px 0;
 }
 .pill { display: inline-block; background: #FFFFFF; border: 1px solid var(--line); color: var(--plum); border-radius: 999px; padding: 2px 12px; font-size: .85rem; margin: 0 var(--s2) var(--s2) 0; }
 .thumb { aspect-ratio: 16 / 9; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #FFFFFF; text-align: center; }
