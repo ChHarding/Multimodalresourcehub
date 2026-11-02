@@ -247,6 +247,10 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 /* Badges, pills, thumbnails */
 .badge { display: inline-block; color: #FFFFFF; border-radius: 999px; padding: 3px 12px; font-size: .85rem; font-weight: 600; }
 .badge.success { background: var(--teal); color: var(--plum); }
+.badge.recommendation-label {
+  background: var(--lavender); color: var(--plum);
+  font-family: 'Fraunces', Georgia, serif; font-weight: 700;
+}
 .pill { display: inline-block; background: #FFFFFF; border: 1px solid var(--line); color: var(--plum); border-radius: 999px; padding: 2px 12px; font-size: .85rem; margin: 0 var(--s2) var(--s2) 0; }
 .thumb { aspect-ratio: 16 / 9; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #FFFFFF; text-align: center; }
 .thumb b { font-family: 'Fraunces', Georgia, serif; font-size: 1.5rem; }
@@ -785,7 +789,7 @@ def render_recommendation_card(item):
     """Card for recommendations with a separate PDF slot for each document."""
     with card(f'recommendation-{slug(item["title"])}'):
         st.markdown(
-            '<span class="badge">Recommendation</span> '
+            '<span class="badge recommendation-label">Recommendation</span> '
             '<span class="badge success">PDF</span>',
             unsafe_allow_html=True,
         )
