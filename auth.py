@@ -437,7 +437,7 @@ def render_signup_form():
         st.caption(
             f"Choose {MIN_USER_ID_LENGTH}–{MAX_USER_ID_LENGTH} characters. "
             "Use letters, numbers, periods, underscores, or hyphens; "
-            "start with a letter or number."
+            "start with a letter or number"
         )
         user_id = st.text_input(
             "Choose a user ID",
