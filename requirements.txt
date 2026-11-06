@@ -2,3 +2,4 @@ streamlit>=1.50
 Authlib>=1.3.2
 fpdf2
 python-docx
+psycopg[binary]>=3.2,<4

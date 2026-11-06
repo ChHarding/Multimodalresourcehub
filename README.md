@@ -8,7 +8,7 @@ The Multimodal Hub Studio is a website and resource hub, featuring a wealth of r
 A Streamlit app that helps college instructors and students find resources,
 browse exemplars, plan lessons, and use rubrics for multimodal projects.
 
-**Live app:** https://YOUR-SUBDOMAIN.streamlit.app
+**Live app:** https://isaac-multimodalsh.streamlit.app
 
 ## Features
 - Search resources by keyword and genre

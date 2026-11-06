@@ -24,6 +24,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 import auth  # accounts: sign up, log in, roles, and the onboarding tutorial (auth.py, same folder)
+import projects  # collaborative project spaces and share links (projects.py, same folder)
 
 # ---------------------------------------------------------------------------
 # 1. PAGE CONFIGURATION
@@ -89,10 +90,150 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 [data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) p { color: #FFFFFF; }
 [data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color: var(--muted); }
 
+/* Signed-out login and signup hero */
+.auth-hero, .st-key-auth_hero {
+  background: linear-gradient(90deg, rgba(22,33,62,.96) 0%, rgba(22,33,62,.84) 42%, rgba(22,33,62,.18) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/welcome-msh-hero.jpg") center / cover no-repeat;
+  min-height: 300px; border-radius: 20px; padding: clamp(24px, 5vw, 56px);
+  margin-bottom: var(--s4); border: 1px solid rgba(255,255,255,.24);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.auth-hero .auth-caption { color: #F0ECF8 !important; font-size: .92rem; margin-top: var(--s3); }
+.auth-hero p, .st-key-auth_hero p { color: #FFFFFF !important; text-shadow: 0 1px 2px rgba(0,0,0,.28); }
+.st-key-auth_hero h1 {
+  font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3rem);
+  line-height: 1.12; color: #FFFFFF; max-width: 20ch; margin: 0 0 var(--s3);
+}
+@media (max-width: 640px) {
+  .auth-hero, .st-key-auth_hero {
+    background-image: linear-gradient(rgba(22,33,62,.86), rgba(22,33,62,.80)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/welcome-msh-hero.jpg");
+    background-position: center; min-height: 250px; padding: 24px;
+  }
+}
+
+/* Shared copyright footer */
+.site-footer {
+  margin-top: clamp(24px, 5vh, 48px);
+  padding: 18px 12px;
+  border-top: 1px solid rgba(45,30,79,.14);
+  color: #665f70;
+  font-size: .88rem;
+  line-height: 1.5;
+  text-align: center;
+}
+.stApp:has(.welcome-splash) .site-footer {
+  border-top-color: rgba(255,255,255,.24);
+  color: rgba(255,255,255,.9);
+}
+
 /* Hero banner (Home) */
 .hero { background: radial-gradient(circle at 88% 16%, rgba(255,107,91,.55), transparent 38%), radial-gradient(circle at 100% 100%, rgba(31,163,154,.45), transparent 34%), var(--plum); border-radius: 20px; padding: clamp(24px, 5vw, 56px); margin-bottom: var(--s4); }
+.hero.hero-home, .st-key-home-hero { background: linear-gradient(90deg, rgba(22,33,62,.94) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.16) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/home-hero.jpg") center / cover no-repeat; min-height: 350px; border: 1px solid rgba(255,255,255,.24); }
+.st-key-home-hero { border-radius: 20px; padding: clamp(24px, 5vw, 56px); margin-bottom: var(--s4); display: flex; flex-direction: column; justify-content: center; }
+.st-key-home-hero h1 { font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3rem); line-height: 1.12; color: #FFFFFF; max-width: 20ch; margin: 0 0 var(--s3); }
+.st-key-home-hero p { color: #E6DFF5; font-size: 1.05rem; max-width: 56ch; margin: 0; }
+@media (max-width: 640px) {
+  .hero.hero-home, .st-key-home-hero { background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/home-hero.jpg"); background-position: center; min-height: 0; }
+  .st-key-home-hero { border-radius: 16px; padding: 24px; }
+}
+
+/* Reveal the welcome hero after a real two-second client-side delay. */
+@keyframes welcome-hero-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stApp:has(.welcome-splash) .welcome-splash {
+  animation: welcome-hero-reveal .35s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stApp:has(.welcome-splash) .welcome-splash { animation: none; }
+}
+
+/* Swivel the welcome video into place when Streamlit renders it. */
+@keyframes video-swivel-land {
+  0% {
+    opacity: 0;
+    transform: perspective(1100px) rotateY(-540deg) rotateX(14deg) translateY(-36px) scale(.78);
+  }
+  72% {
+    opacity: 1;
+    transform: perspective(1100px) rotateY(12deg) rotateX(-2deg) translateY(4px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1100px) rotateY(0) rotateX(0) translateY(0) scale(1);
+  }
+}
+.stApp:has(.welcome-splash) [data-testid="stVideo"] {
+  transform-origin: center;
+  animation: video-swivel-land 1.8s cubic-bezier(.2, .8, .2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stApp:has(.welcome-splash) [data-testid="stVideo"] { animation: none; }
+}
+
+/* Welcome splash: keep the About image behind the title, video, and Begin Here button. */
+.stApp:has(.welcome-splash) [data-testid="stAppViewContainer"] {
+  background: linear-gradient(90deg, rgba(10,16,31,.405) 0%, rgba(10,16,31,.288) 30%, rgba(10,16,31,.063) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/about-page-hero.jpg") center / cover no-repeat fixed;
+}
+.stApp:has(.welcome-splash) [data-testid="stMain"],
+.stApp:has(.welcome-splash) [data-testid="stHeader"] { background: transparent; }
+.stApp:has(.welcome-splash) [data-testid="stMainBlockContainer"] { min-height: 100vh; background: transparent; }
+@media (max-width: 640px) {
+  .stApp:has(.welcome-splash) [data-testid="stAppViewContainer"] {
+    background-image: linear-gradient(rgba(10,16,31,.351), rgba(10,16,31,.351)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/about-page-hero.jpg");
+    background-position: center;
+    background-attachment: scroll;
+  }
+}
+.hero.search-resources-hero, .st-key-search-resources-hero { background: linear-gradient(90deg, rgba(22,33,62,.94) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.16) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/search-resources-hero.jpg") center / cover no-repeat; min-height: 300px; border: 1px solid rgba(255,255,255,.24); }
+@media (max-width: 640px) {
+  .hero.search-resources-hero, .st-key-search-resources-hero { background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/search-resources-hero.jpg"); background-position: center; min-height: 0; }
+}
+.hero.browse-exemplars-hero, .st-key-browse-exemplars-hero { background: linear-gradient(90deg, rgba(22,33,62,.94) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.16) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/browse-exemplars-hero.jpg") center / cover no-repeat; min-height: 300px; border: 1px solid rgba(255,255,255,.24); }
+@media (max-width: 640px) {
+  .hero.browse-exemplars-hero, .st-key-browse-exemplars-hero { background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/browse-exemplars-hero.jpg"); background-position: center; min-height: 0; }
+}
+.hero.lesson-plans-hero, .st-key-lesson-plans-hero { background: linear-gradient(90deg, rgba(22,33,62,.94) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.16) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/lesson-plans-hero.jpg") center / cover no-repeat; min-height: 300px; border: 1px solid rgba(255,255,255,.24); }
+@media (max-width: 640px) {
+  .hero.lesson-plans-hero, .st-key-lesson-plans-hero { background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/lesson-plans-hero.jpg"); background-position: center; min-height: 0; }
+}
+.hero.rubrics-hero, .st-key-rubrics-hero { background: linear-gradient(90deg, rgba(22,33,62,.94) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.16) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/rubrics-hero.jpg") center / cover no-repeat; min-height: 300px; border: 1px solid rgba(255,255,255,.24); }
+@media (max-width: 640px) {
+  .hero.rubrics-hero, .st-key-rubrics-hero { background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/rubrics-hero.jpg"); background-position: center; min-height: 0; }
+}
+.hero.project-space-hero, .st-key-project-space-hero {
+  background: linear-gradient(90deg, rgba(22,33,62,.94) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.16) 100%), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/project-space-hero.jpg?v=4fc5044") center / cover no-repeat;
+  min-height: 300px; border: 1px solid rgba(255,255,255,.24);
+}
+@media (max-width: 640px) {
+  .hero.project-space-hero, .st-key-project-space-hero {
+    background-image: linear-gradient(rgba(22,33,62,.82), rgba(22,33,62,.74)), url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/project-space-hero.jpg?v=4fc5044");
+    background-position: center; min-height: 0;
+  }
+}
 .stApp h1.hero-title { font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3rem) !important; line-height: 1.12; color: #FFFFFF !important; max-width: 20ch; margin: 0 0 var(--s3); padding: 0; }
 .hero p { color: #E6DFF5 !important; font-size: 1.05rem; max-width: 56ch; margin: 0; }
+.st-key-search-resources-hero, .st-key-browse-exemplars-hero,
+.st-key-lesson-plans-hero, .st-key-rubrics-hero, .st-key-project-space-hero {
+  border-radius: 20px; padding: clamp(24px, 5vw, 56px); margin-bottom: var(--s4);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.st-key-project-space-hero h1 {
+  font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3rem) !important; line-height: 1.12;
+  color: #FFFFFF !important; max-width: 20ch; margin: 0 0 var(--s3); padding: 0;
+}
+.st-key-project-space-hero p {
+  color: #E6DFF5 !important; font-size: 1.05rem; max-width: 56ch; margin: 0;
+}
+.st-key-search-resources-hero h1, .st-key-browse-exemplars-hero h1,
+.st-key-lesson-plans-hero h1, .st-key-rubrics-hero h1 {
+  font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3rem); line-height: 1.12;
+  color: #fff; max-width: 20ch; margin: 0 0 var(--s3);
+}
+.st-key-search-resources-hero p, .st-key-browse-exemplars-hero p,
+.st-key-lesson-plans-hero p, .st-key-rubrics-hero p {
+  color: #E6DFF5; font-size: 1.05rem; max-width: 56ch; margin: 0;
+}
 .chips { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s5); }
 .chip { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); border-radius: 12px; padding: var(--s2) var(--s4); color: #FFFFFF; font-size: .95rem; }
 .chip b { font-family: 'Fraunces', Georgia, serif; font-size: 1.5rem; margin-right: var(--s2); }
@@ -106,6 +247,11 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 /* Badges, pills, thumbnails */
 .badge { display: inline-block; color: #FFFFFF; border-radius: 999px; padding: 3px 12px; font-size: .85rem; font-weight: 600; }
 .badge.success { background: var(--teal); color: var(--plum); }
+.badge.recommendation-label {
+  background: var(--lavender); color: var(--plum);
+  font-family: 'Fraunces', Georgia, serif; font-size: 1.45rem;
+  font-weight: 700; line-height: 1.2; padding: 6px 14px 6px 0;
+}
 .pill { display: inline-block; background: #FFFFFF; border: 1px solid var(--line); color: var(--plum); border-radius: 999px; padding: 2px 12px; font-size: .85rem; margin: 0 var(--s2) var(--s2) 0; }
 .thumb { aspect-ratio: 16 / 9; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #FFFFFF; text-align: center; }
 .thumb b { font-family: 'Fraunces', Georgia, serif; font-size: 1.5rem; }
@@ -172,8 +318,21 @@ table.rubric th.crit { background: var(--lavender); color: var(--plum); border-t
 @media (max-width: 640px) {
   .block-container, [data-testid="stMainBlockContainer"] { padding: var(--s4) var(--s4) var(--s6); }
   .hero { border-radius: 16px; }
+  .st-key-search-resources-hero, .st-key-browse-exemplars-hero,
+  .st-key-lesson-plans-hero, .st-key-rubrics-hero { border-radius: 16px; padding: 24px; }
   .chip b { font-size: 1.25rem; }
 }
+@keyframes begin-here-pulse {
+  0%, 100% { filter: brightness(1); box-shadow: 0 0 0 0 rgba(255,107,91,0); }
+  50% { filter: brightness(1.14); box-shadow: 0 0 0 7px rgba(255,107,91,.24); }
+}
+.st-key-welcome_begin [data-testid="stBaseButton-primary"] {
+  animation: begin-here-pulse 1.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-key-welcome_begin [data-testid="stBaseButton-primary"] { animation: none; }
+}
+
 </style>
 """
 
@@ -234,6 +393,26 @@ RESOURCES = [
      "tags": ["citation", "AI policy", "attribution"],
      "includes": ["Citation patterns for images, audio, and video", "Sample AI disclosure statement"],
      "classroom_use": "Attach to the assignment sheet so expectations are clear before work begins."},
+]
+
+READING_RECOMMENDATIONS = [
+    {
+        "title": "Books and Articles",
+        "description": "Recommended books and selected articles about multimodal teaching and learning.",
+        "tags": ["books", "articles", "research"],
+        "documents": [
+            {"title": "Books", "pdf": "assets/recommendations/books.pdf"},
+            {"title": "Articles", "pdf": "assets/recommendations/articles.pdf"},
+        ],
+    },
+    {
+        "title": "Videos",
+        "description": "Recommended videos for exploring multimodal ideas and practices.",
+        "tags": ["videos", "media"],
+        "documents": [
+            {"title": "Videos", "pdf": "assets/recommendations/videos.pdf"},
+        ],
+    },
 ]
 
 # Genres for the filter menu are built from the data, so new genres appear automatically
@@ -459,6 +638,54 @@ RUBRICS = [
          crit("Sources and attribution", 20, "All sources are credited on the page.", "Most sources are credited.",
               "Some credits are missing.", "Sources are not credited."),
      ]},
+    {"id": "comics-rubric", "title": "Comics Rubric", "genre": "Comics",
+     "description": "Assesses a comic for storytelling, panel flow, text-image integration, and craft.",
+     "criteria": [
+         crit("Story and purpose", 25, "A compelling story or argument is clear throughout.", "The main story or argument is clear with minor gaps.",
+              "The story or argument is uneven or underdeveloped.", "No clear story or argument is presented."),
+         crit("Panel flow and composition", 25, "Panel order, framing, and pacing guide the reader smoothly.", "Panel order and pacing are mostly clear.",
+              "Some transitions or panels are confusing.", "Panel order or page flow is difficult to follow."),
+         crit("Text and image integration", 30, "Words and images work together to build meaning and tone.", "Words and images mostly support each other.",
+              "Text and images are loosely connected or repetitive.", "Text or images are missing or distract from meaning."),
+         crit("Craft, access, and credits", 20, "Artwork and lettering are polished; content is accessible and sources are credited.", "Work is readable; most access needs and credits are addressed.",
+              "Craft is uneven; access details or credits are missing.", "Work is difficult to read; access and credits are not addressed."),
+     ]},
+    {"id": "zine-rubric", "title": "Zine Rubric", "genre": "Zine",
+     "description": "Assesses a zine for purpose, voice, organization, visual design, and responsible production.",
+     "criteria": [
+         crit("Purpose and audience", 20, "Purpose and audience are specific and shape the whole zine.", "Purpose and audience are clear in most sections.",
+              "Purpose or audience is broad or inconsistent.", "Purpose and audience are not apparent."),
+         crit("Content, voice, and perspective", 30, "Content is thoughtful, original, and expressed in a distinctive voice.", "Content is relevant and voice is mostly consistent.",
+              "Content or voice is uneven or general.", "Content is incomplete or lacks a clear point of view."),
+         crit("Organization and readability", 25, "Sections, sequence, and typography make the zine easy to navigate.", "Organization and typography are mostly clear.",
+              "Some sections or text are hard to follow.", "The zine is difficult to navigate or read."),
+         crit("Visual craft, access, and credits", 25, "Visual choices reinforce meaning; access needs and sources are handled carefully.", "Visual choices support the content; most access needs and credits are addressed.",
+              "Visual choices are inconsistent; some access details or credits are missing.", "Visual design distracts; access and credits are not addressed."),
+     ]},
+    {"id": "poster-rubric", "title": "Poster Rubric", "genre": "Poster",
+     "description": "Assesses a poster for message, evidence, visual hierarchy, accessibility, and attribution.",
+     "criteria": [
+         crit("Message and audience", 25, "A focused message is immediately clear to the intended audience.", "The message and audience are clear with minor ambiguity.",
+              "The message is broad or takes effort to identify.", "No clear message or audience is evident."),
+         crit("Evidence and information", 25, "Information is accurate, relevant, and supports the central message.", "Information is mostly accurate and supports the message.",
+              "Some information is unclear, weakly supported, or inaccurate.", "Information is missing or substantially inaccurate."),
+         crit("Visual hierarchy and readability", 30, "Layout, contrast, and type guide attention; text is readable at viewing distance.", "Layout and text are mostly clear and readable.",
+              "Hierarchy is uneven or some text is difficult to read.", "Clutter or poor legibility obscures the message."),
+         crit("Accessibility and attribution", 20, "Color, language, and image choices are accessible; all sources are credited.", "Most access needs and sources are addressed.",
+              "Some access needs or source credits are missing.", "Accessibility is not considered and sources are not credited."),
+     ]},
+    {"id": "newsletter-rubric", "title": "Newsletter Rubric", "genre": "Newsletter",
+     "description": "Assesses a newsletter for audience focus, useful content, organization, design, accessibility, and credits.",
+     "criteria": [
+         crit("Purpose and audience", 20, "Purpose is clear and content is tailored to the intended readers.", "Purpose and audience are clear in most sections.",
+              "Purpose or audience is inconsistent.", "Purpose and audience are unclear."),
+         crit("Content and accuracy", 30, "Articles are useful, accurate, and engaging, with clear headlines and details.", "Content is relevant and mostly accurate.",
+              "Some content is vague, incomplete, or unevenly checked.", "Content is confusing, incomplete, or substantially inaccurate."),
+         crit("Organization and readability", 25, "Sections are easy to scan; headings, length, and links support readers.", "Most sections are organized and readable.",
+              "Some sections are hard to scan or follow.", "Organization and writing make the newsletter difficult to use."),
+         crit("Visual design, access, and credits", 25, "Design is consistent and accessible; images and sources are credited.", "Design is mostly consistent; most access needs and credits are addressed.",
+              "Design is uneven; some access details or credits are missing.", "Design interferes with reading; accessibility and credits are absent."),
+     ]}
 ]
 RUBRIC_GENRES = sorted(r["genre"] for r in RUBRICS)
 
@@ -503,12 +730,25 @@ def render_exemplar(e):
     """Bordered card: thumbnail placeholder, genre badge, title, description, objectives, link button."""
     color = EXEMPLAR_GENRE_COLORS[e["genre"]]
     with card(f'ex-{slug(e["title"])}'):
-        # Thumbnail placeholder (swap for st.image(...) when real screenshots exist)
-        st.markdown(
-            f'<div class="thumb" role="img" aria-label="Placeholder thumbnail for {esc(e["title"])}" style="background:{color}">'
-            f'<b>{esc(e["genre"])}</b><span>Thumbnail placeholder</span></div>',
-            unsafe_allow_html=True,
-        )
+        thumbnails = {
+            "Comics": Path("assets/comics-thumbnail.jpg"),
+            "Digital Story": Path("assets/digital-story-thumbnail.jpg"),
+            "Infographic": Path("assets/infographic-thumbnail.jpg"),
+            "Website": Path("assets/website-thumbnail.jpg"),
+            "Podcast": Path("assets/podcast-thumbnail.jpg"),
+            "Poster": Path("assets/poster-thumbnail.jpg"),
+            "Video Essay": Path("assets/video-essay-thumbnail.jpg"),
+        }
+        thumbnail = thumbnails.get(e["genre"])
+        if thumbnail and thumbnail.is_file():
+            st.image(str(thumbnail), caption=e["title"], use_container_width=True)
+        else:
+            # Keep the styled placeholder for genres without a supplied thumbnail.
+            st.markdown(
+                f'<div class="thumb" role="img" aria-label="Placeholder thumbnail for {esc(e["title"])}" style="background:{color}">'
+                f'<b>{esc(e["genre"])}</b><span>Thumbnail placeholder</span></div>',
+                unsafe_allow_html=True,
+            )
         st.markdown(f'<span class="badge" style="background:{color}">{esc(e["genre"])}</span>', unsafe_allow_html=True)
         st.markdown(f'<h3 class="res-title">{esc(e["title"])}</h3>', unsafe_allow_html=True)
         st.caption(e["course"])
@@ -546,6 +786,44 @@ def search_resources(resources, query, genre):
     return [r for _, r in scored]
 
 
+def render_recommendation_card(item):
+    """Card for recommendations with a separate PDF slot for each document."""
+    with card(f'recommendation-{slug(item["title"])}'):
+        st.markdown(
+            '<span class="badge recommendation-label">Recommendation</span> '
+            '<span class="badge success">PDF</span>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f'<h3 class="res-title">{esc(item["title"])}</h3>',
+            unsafe_allow_html=True,
+        )
+        st.write(item["description"])
+        st.markdown(
+            "".join(f'<span class="pill">{esc(tag)}</span>' for tag in item["tags"]),
+            unsafe_allow_html=True,
+        )
+
+        with st.expander("View details"):
+            st.write(item["description"])
+
+        with st.expander("PDF documents"):
+            for document in item["documents"]:
+                st.markdown(f'**{esc(document["title"])}**')
+                pdf_path = Path(__file__).resolve().parent / document["pdf"]
+                if pdf_path.is_file():
+                    st.download_button(
+                        f'Download {document["title"]} PDF',
+                        data=pdf_path.read_bytes(),
+                        file_name=pdf_path.name,
+                        mime="application/pdf",
+                        key=f'recommendation_pdf_{slug(item["title"])}_{slug(document["title"])}',
+                        type="primary",
+                    )
+                else:
+                    st.caption(f'Add the PDF file at: {document["pdf"]}')
+
+
 def render_resource_card(r):
     """Bordered card: genre badge, title, description, tags, and an expander for details."""
     color = MODALITY_COLORS.get(r["modality"], "#16807A")
@@ -565,10 +843,22 @@ def render_resource_card(r):
         render_related_resources("resource", r["genre"], r["title"])
 
 
-def page_header(title, blurb):
-    """Standard page title (h1) and a one-line lead paragraph."""
-    st.title(title)
-    st.markdown(f'<p class="lead">{esc(blurb)}</p>', unsafe_allow_html=True)
+def typewriter_chunks(text, delay=0.012):
+    """Yield text in short chunks for Streamlit's native typewriter effect."""
+    for character in text:
+        yield character
+        time.sleep(delay)
+
+
+def page_header(title, blurb, hero_class=None):
+    """Render a standard page heading, or a photo hero when a class is supplied."""
+    if hero_class:
+        with st.container(key=hero_class):
+            st.write_stream(typewriter_chunks(f"# {title}"))
+            st.write_stream(typewriter_chunks(blurb))
+    else:
+        st.title(title)
+        st.markdown(f'<p class="lead">{esc(blurb)}</p>', unsafe_allow_html=True)
 
 
 def go_to(page):
@@ -638,12 +928,10 @@ def page_home():
     # Hero banner with count chips (counts come from the data, so they stay accurate)
     counts = [(len(RESOURCES), "resources"), (len(EXEMPLARS), "exemplars"), (len(LESSON_PLANS), "lesson plans"), (len(RUBRICS), "rubrics")]
     chips = "".join(f'<div class="chip"><b>{n}</b>{label}</div>' for n, label in counts)
-    st.markdown(
-        '<div class="hero"><h1 class="hero-title">Teach and learn through writing, image, sound, and video.</h1>'
-        f"<p>{greeting}{blurb}</p>"
-        f'<div class="chips">{chips}</div></div>',
-        unsafe_allow_html=True,
-    )
+    with st.container(key="home-hero"):
+        st.write_stream(typewriter_chunks("# Teach and learn through writing, image, sound, and video."))
+        st.write_stream(typewriter_chunks(f"{greeting}{blurb}"))
+        st.markdown(f'<div class="chips">{chips}</div>', unsafe_allow_html=True)
 
     # Calls to action under the hero (one primary, one secondary)
     c1, c2, _ = st.columns([1, 1, 2])
@@ -681,15 +969,16 @@ def page_about():
     """About page for the Multimodal Studio Hub."""
     st.markdown("""
     <style>
-    .about-hero {
-        display: grid; grid-template-columns: 1.35fr 1fr; align-items: center;
-        gap: 32px; padding: clamp(24px, 5vw, 56px); margin-bottom: var(--s6);
-        color: #fff; background: radial-gradient(circle at 85% 15%, rgba(255,107,91,.42), transparent 32%),
-        radial-gradient(circle at 95% 100%, rgba(31,163,154,.38), transparent 35%), var(--plum);
+    .about-hero, .st-key-about_hero {
+        display: flex; align-items: center; min-height: 320px;
+        padding: clamp(24px, 5vw, 56px); margin-bottom: var(--s6);
+        color: #fff;
+        background: linear-gradient(90deg, rgba(22,33,62,.95) 0%, rgba(22,33,62,.82) 44%, rgba(22,33,62,.12) 100%),
+        url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/about-page-hero.jpg") center / cover no-repeat;
         border-radius: 20px; overflow: hidden;
     }
-    .about-hero h1 { color: #fff !important; margin: 0 0 var(--s3); }
-    .about-hero p { color: #F6F3FC !important; font-size: 1.05rem; max-width: 52ch; }
+    .about-hero h1, .st-key-about_hero h1 { color: #fff !important; margin: 0 0 var(--s3); }
+    .about-hero p, .st-key-about_hero p { color: #F6F3FC !important; font-size: 1.05rem; max-width: 52ch; }
     .media-collage { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; transform: rotate(2deg); }
     .media-tile { min-height: 118px; display: flex; flex-direction: column; justify-content: center;
         align-items: center; border: 1px solid rgba(255,255,255,.3); border-radius: 16px;
@@ -704,23 +993,22 @@ def page_about():
         background: linear-gradient(135deg, #4B3A7A, #1FA39A); color: white;
         font: 700 2.5rem 'Fraunces', Georgia, serif; }
     @media (max-width: 700px) {
-        .about-hero { grid-template-columns: 1fr; }
+        .about-hero, .st-key-about_hero {
+            background-image: linear-gradient(rgba(22,33,62,.86), rgba(22,33,62,.80)),
+            url("https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/about-page-hero.jpg");
+            background-position: center; min-height: 280px;
+        }
         .media-tile { min-height: 86px; }
     }
     </style>
-    <section class="about-hero" aria-labelledby="about-title">
-      <div>
-        <h1 id="about-title">Many ways to make meaning</h1>
-        <p>The Multimodal Studio Hub brings together practical resources, examples, and teaching ideas for creating with text, sound, video, and interactive media.</p>
-      </div>
-      <div class="media-collage" role="img" aria-label="A collage representing text, audio, video, and interactive media">
-        <div class="media-tile"><span aria-hidden="true">✍️</span><small>Text</small></div>
-        <div class="media-tile"><span aria-hidden="true">🎙️</span><small>Audio</small></div>
-        <div class="media-tile"><span aria-hidden="true">🎬</span><small>Video</small></div>
-        <div class="media-tile"><span aria-hidden="true">🖱️</span><small>Interactive</small></div>
-      </div>
-    </section>
     """, unsafe_allow_html=True)
+
+    with st.container(key="about_hero"):
+        st.write_stream(typewriter_chunks("# Many ways to make meaning"))
+        st.write_stream(typewriter_chunks(
+            "The Multimodal Studio Hub brings together practical resources, examples, and teaching ideas for creating with text, sound, video, and interactive media."
+        ))
+
 
     # The Why Block
     st.header("Why multimodal learning?")
@@ -841,7 +1129,11 @@ def render_empty_state(query, genre):
 
 
 def page_search():
-    page_header("Search resources", "Search by keyword, then narrow the results by genre.")
+    page_header(
+        "Search resources",
+        "Search by keyword, then narrow the results by genre.",
+        hero_class="search-resources-hero",
+    )
 
     # Make sure the session values exist before any widget reads them
     st.session_state.setdefault("search_query", "")
@@ -879,6 +1171,10 @@ def page_search():
         st.header("Featured resources")
         st.write(f"Start with these picks, or type a keyword or choose a genre to explore all {len(RESOURCES)} resources.")
         card_grid([r for r in RESOURCES if r.get("featured")], render_resource_card)
+
+        st.header("Reading and Other Recommendations")
+        st.write("Explore recommended books, articles, and videos.")
+        card_grid(READING_RECOMMENDATIONS, render_recommendation_card)
         return
 
     # Otherwise run the search; the count sits in a polite live region for screen readers
@@ -901,7 +1197,11 @@ def reset_exemplar_filters():
 
 
 def page_exemplars():
-    page_header("Browse exemplars", "Sample multimodal projects (placeholders). Filter by genre, choose a sort order, then open a project from its card.")
+    page_header(
+        "Browse exemplars",
+        "Sample multimodal projects (placeholders). Filter by genre, choose a sort order, then open a project from its card.",
+        hero_class="browse-exemplars-hero",
+    )
     st.session_state.setdefault("ex_genres", [])
     st.session_state.setdefault("ex_sort", SORT_OPTIONS[0])
 
@@ -935,29 +1235,150 @@ def page_exemplars():
             card_grid([e for e in shown if e["genre"] == genre], render_exemplar)
 
 
-def plan_to_text(plan):
-    """Turn one lesson plan into a plain-text file instructors can print or paste into a course site."""
-    lines = [plan["title"].upper(), "=" * len(plan["title"]), "",
-             f'Genre: {plan["genre"]}', f'Course level: {plan["level"]}', f'Duration: {plan["duration_min"]} minutes', "",
-             "DESCRIPTION", plan["description"], "", "LEARNING OBJECTIVES"]
-    lines += [f"{i}. {o}" for i, o in enumerate(plan["objectives"], 1)]
-    lines += ["", "MATERIALS"] + [f"- {m}" for m in plan["materials"]]
-    lines += ["", "PREPARATION", plan["prep"], "", "TIMELINE"]
+def lesson_plan_to_pdf(plan):
+    """Create a print-ready PDF for one lesson plan."""
+    from fpdf import FPDF
+
+    pdf = FPDF(orientation="P", unit="mm", format="Letter")
+    pdf.set_margins(18, 18, 18)
+    pdf.set_auto_page_break(auto=True, margin=18)
+    pdf.set_title(plan["title"])
+    pdf.set_author("The Multimodal Studio Hub")
+    pdf.add_page()
+
+    def write_text(text, line_height):
+        # multi_cell defaults to moving the cursor to the right edge; reset it
+        # after every block so the next block has the full printable width.
+        pdf.multi_cell(0, line_height, latin(text), new_x="LMARGIN", new_y="NEXT")
+
+    pdf.set_text_color(45, 30, 79)
+    pdf.set_font("Helvetica", "B", 19)
+    write_text(plan["title"], 9)
+    pdf.set_draw_color(31, 163, 154)
+    pdf.set_line_width(1.2)
+    y = pdf.get_y() + 1
+    pdf.line(18, y, 194, y)
+    pdf.ln(5)
+
+    pdf.set_text_color(75, 58, 122)
+    pdf.set_font("Helvetica", "B", 10)
+    write_text(
+        f'Genre: {plan["genre"]}   |   Course level: {plan["level"]}   |   '
+        f'Duration: {plan["duration_min"]} minutes',
+        6,
+    )
+    pdf.ln(3)
+
+    def section(heading, body=None, items=None):
+        pdf.set_text_color(45, 30, 79)
+        pdf.set_font("Helvetica", "B", 12)
+        pdf.cell(0, 8, latin(heading), new_x="LMARGIN", new_y="NEXT")
+        pdf.set_text_color(35, 31, 42)
+        pdf.set_font("Helvetica", "", 10)
+        if body:
+            write_text(body, 5.5)
+        if items:
+            for index, item in enumerate(items, 1):
+                prefix = f"{index}. " if heading == "Learning objectives" else "- "
+                write_text(prefix + str(item), 5.5)
+        pdf.ln(2)
+
+    section("Description", body=plan["description"])
+    section("Learning objectives", items=plan["objectives"])
+    section("Preparation", body=plan["prep"])
+    section("Materials", items=plan["materials"])
+
+    pdf.set_text_color(45, 30, 79)
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 8, "Timeline", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_text_color(35, 31, 42)
+    pdf.set_font("Helvetica", "", 10)
     start = 0
     for minutes, activity in plan["timeline"]:
-        lines.append(f"{start:>3}-{start + minutes:<3} min  {activity}")
+        write_text(f"{start}-{start + minutes} min: {activity}", 5.5)
         start += minutes
-    lines += ["", "ASSESSMENT", plan["assessment"], "", "-" * 40,
-              "Sample plan from Multimodal Studio Hub. Adapt it freely for your course."]
-    return "\n".join(lines) + "\n"
+    pdf.ln(2)
+
+    section("Assessment", body=plan["assessment"])
+    pdf.set_text_color(90, 81, 112)
+    pdf.set_font("Helvetica", "I", 8)
+    write_text("Sample plan from Multimodal Studio Hub. Adapt it freely for your course.", 4)
+    return bytes(pdf.output())
+
+
+def lesson_plan_to_docx(plan):
+    """Create an editable Word document for one lesson plan."""
+    from docx import Document
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.shared import Inches, Pt, RGBColor
+
+    doc = Document()
+    section = doc.sections[0]
+    section.top_margin = Inches(0.7)
+    section.bottom_margin = Inches(0.7)
+    section.left_margin = Inches(0.8)
+    section.right_margin = Inches(0.8)
+
+    title = doc.add_heading(plan["title"], level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    for run in title.runs:
+        run.font.color.rgb = RGBColor(45, 30, 79)
+
+    meta = doc.add_paragraph()
+    meta_run = meta.add_run(
+        f'Genre: {plan["genre"]}  |  Course level: {plan["level"]}  |  '
+        f'Duration: {plan["duration_min"]} minutes'
+    )
+    meta_run.bold = True
+    meta_run.font.color.rgb = RGBColor(75, 58, 122)
+
+    def add_section(heading, body=None, items=None, numbered=False):
+        doc.add_heading(heading, level=1)
+        if body:
+            doc.add_paragraph(body)
+        if items:
+            style = "List Number" if numbered else "List Bullet"
+            for item in items:
+                doc.add_paragraph(str(item), style=style)
+
+    add_section("Description", body=plan["description"])
+    add_section("Learning objectives", items=plan["objectives"], numbered=True)
+    add_section("Preparation", body=plan["prep"])
+    add_section("Materials", items=plan["materials"])
+
+    doc.add_heading("Timeline", level=1)
+    table = doc.add_table(rows=1, cols=2)
+    table.style = "Light Shading Accent 1"
+    table.rows[0].cells[0].text = "Time"
+    table.rows[0].cells[1].text = "Activity"
+    start = 0
+    for minutes, activity in plan["timeline"]:
+        cells = table.add_row().cells
+        cells[0].text = f"{start}-{start + minutes} min"
+        cells[1].text = str(activity)
+        start += minutes
+
+    add_section("Assessment", body=plan["assessment"])
+    note = doc.add_paragraph(
+        "Sample plan from Multimodal Studio Hub. Adapt it freely for your course."
+    )
+    for run in note.runs:
+        run.italic = True
+        run.font.size = Pt(9)
+        run.font.color.rgb = RGBColor(90, 81, 112)
+
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    return buffer.getvalue()
 
 
 def plans_to_zip(plans):
-    """Bundle several plans into one zip file (one text file per plan), held in memory."""
+    """Bundle PDF and editable Word versions of each lesson plan into one zip."""
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         for plan in plans:
-            archive.writestr(f'{plan["id"]}.txt', plan_to_text(plan))
+            archive.writestr(f'{plan["id"]}.pdf', lesson_plan_to_pdf(plan))
+            archive.writestr(f'{plan["id"]}.docx', lesson_plan_to_docx(plan))
     return buffer.getvalue()
 
 
@@ -996,8 +1417,18 @@ def render_plan_card(plan):
             st.write(plan["assessment"])
         # Downloads are an instructor tool; everyone else can still preview the plan above
         if auth.has_instructor_access(auth.current_user()):
-            st.download_button(f'Download {plan["title"]} (.txt)', data=plan_to_text(plan), file_name=f'{plan["id"]}.txt',
-                               mime="text/plain", key=f'dl_{plan["id"]}', help="Saves a plain-text copy you can edit", type="primary")
+            try:
+                pdf_bytes = lesson_plan_to_pdf(plan)
+                docx_bytes = lesson_plan_to_docx(plan)
+            except ImportError:
+                notice("PDF and Word downloads need the fpdf2 and python-docx packages. Add both to requirements.txt.", "alert", "alert")
+                return
+            pdf_col, word_col = st.columns(2)
+            pdf_col.download_button(f'Download {plan["title"]} (PDF)', data=pdf_bytes, file_name=f'{plan["id"]}.pdf',
+                                    mime="application/pdf", key=f'dl_pdf_{plan["id"]}', help="Downloads a print-ready PDF copy", type="primary")
+            word_col.download_button(f'Download {plan["title"]} (Word)', data=docx_bytes, file_name=f'{plan["id"]}.docx',
+                                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                     key=f'dl_docx_{plan["id"]}', help="Editable in Word or Google Docs", type="primary")
         render_related_resources("lesson", plan["genre"], plan["title"])
 
 
@@ -1017,9 +1448,17 @@ def reset_plan_filters():
 
 def page_lessons():
     if auth.has_instructor_access(auth.current_user()):
-        page_header("Lesson plans", "Preview sample plans for multimodal projects, then download them to adapt for your own course.")
+        page_header(
+            "Lesson plans",
+            "Preview sample plans for multimodal projects, then download them to adapt for your own course.",
+            hero_class="lesson-plans-hero",
+        )
     else:
-        page_header("Lesson plans", "Preview sample plans for multimodal projects. Downloads are available to verified instructors.")
+        page_header(
+            "Lesson plans",
+            "Preview sample plans for multimodal projects. Downloads are available to verified instructors.",
+            hero_class="lesson-plans-hero",
+        )
     st.session_state.setdefault("lp_genre", "All genres")
     st.session_state.setdefault("lp_level", "All levels")
     st.session_state.setdefault("lp_time", "Any length")
@@ -1041,8 +1480,8 @@ def page_lessons():
     if plans:
         if auth.has_instructor_access(auth.current_user()):
             # One download for everything currently shown, then the preview cards
-            st.download_button(f"Download all {len(plans)} shown (.zip)", data=plans_to_zip(plans), file_name="lesson-plans.zip",
-                               mime="application/zip", key="lp_zip", help="One text file per plan, bundled in a zip", type="primary")
+            st.download_button(f"Download all {len(plans)} shown (PDF + Word ZIP)", data=plans_to_zip(plans), file_name="lesson-plans-pdf-and-word.zip",
+                               mime="application/zip", key="lp_zip", help="PDF and editable Word files for each shown plan, bundled in a zip", type="primary")
         else:
             notice(lesson_download_message(auth.current_user()))
         card_grid(plans, render_plan_card)
@@ -1200,7 +1639,11 @@ def render_rubric_card(rubric):
 
 
 def page_rubrics():
-    page_header("Rubrics", "Preview a rubric, then download it as a PDF or Word document to adapt for your assignment.")
+    page_header(
+        "Rubrics",
+        "Preview a rubric, then download it as a PDF or Word document to adapt for your assignment.",
+        hero_class="rubrics-hero",
+    )
     st.session_state.setdefault("rb_genre", "All genres")
 
     # Genre filter
@@ -1221,51 +1664,96 @@ def page_rubrics():
 # The sidebar radio stores the current page in st.session_state["nav"];
 # PAGES maps each label to the function that draws it.
 # ---------------------------------------------------------------------------
+def page_project_space():
+    """Render collaborative projects for the current signed-in user."""
+    projects.render_projects_page(auth.current_user())
+
+
 PAGES = {
     "Home": page_home,
     "Search Resources": page_search,
     "Browse Exemplars": page_exemplars,
+    "Project Space": page_project_space,
     "Lesson Plans": page_lessons,
     "Rubrics": page_rubrics,
     "About": page_about,
 }
 
 
-def show_welcome_splash():
-    """Show a welcome splash once per unauthenticated session, then continue to login."""
-    if st.session_state.get("welcome_splash_shown"):
-        return
-    st.session_state["welcome_splash_shown"] = True
-
+def render_copyright_footer():
+    """Show the site copyright notice at the bottom of the current page."""
     st.markdown(
-        '<div class="hero"><h1 class="hero-title">Welcome to Multimodal Studio Hub</h1>'
-        '<p>Explore resources for creating, teaching, and learning through text, audio, video, and interactive media.</p></div>',
+        '<footer class="site-footer">Copyright &copy; 2026 The Multimodal Studio Hub. All Rights Reserved</footer>',
         unsafe_allow_html=True,
     )
 
+
+def show_welcome_splash():
+    """Show only the welcome intro until the visitor chooses to continue."""
+    if st.session_state.get("welcome_splash_shown"):
+        return
+
+    st.html("""
+    <div class="hero hero-home welcome-splash">
+      <h1 class="hero-title" id="welcome-title"
+          aria-label="Welcome to the Multimodal Studio Hub"></h1>
+      <p id="welcome-description"
+         aria-label="Explore resources for creating, teaching, and learning through text, audio, video, and interactive media."></p>
+    </div>
+
+    <script>
+    const title = "Welcome to the Multimodal Studio Hub";
+    const description =
+      "Explore resources for creating, teaching, and learning through text, audio, video, and interactive media.";
+
+    async function typeText(element, text, delay = 12) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        element.textContent = text;
+        return;
+      }
+
+      for (const character of text) {
+        element.textContent += character;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+
+    typeText(document.getElementById("welcome-title"), title)
+      .then(() => typeText(document.getElementById("welcome-description"), description));
+    </script>
+    """, unsafe_allow_javascript=True)
+
+    # Show the video immediately with its swivel landing animation; reveal the button two seconds later.
     intro_video = Path("assets/welcome-intro.mp4")
     if intro_video.is_file():
         st.video(str(intro_video))
     else:
-        st.markdown(
-            '<div class="notice" role="note"><strong>Video introduction placeholder</strong><br>'
-            'Add a short video at <code>assets/welcome-intro.mp4</code> to display it here.</div>',
-            unsafe_allow_html=True,
-        )
+        st.video("https://www.youtube.com/watch?v=j28H9btX5vs")
 
-    countdown = st.empty()
-    for seconds_left in range(8, 0, -1):
-        countdown.caption(f"Continuing to sign in in {seconds_left} seconds…")
-        time.sleep(1)
-    countdown.empty()
+    time.sleep(2)
+    left, center, right = st.columns([1, 1.4, 1])
+    if center.button(
+        "▶ Begin Here",
+        key="welcome_begin",
+        type="primary",
+        use_container_width=True,
+    ):
+        st.session_state["welcome_splash_shown"] = True
+        st.rerun()
+
+    render_copyright_footer()
 
 
 def main():
     st.markdown(CSS, unsafe_allow_html=True)
     st.session_state.setdefault("nav", "Home")
 
-    if not auth.current_user():
+    # A read-only project share link may be viewed without signing in.
+    projects.handle_shared_link()
+
+    if not auth.current_user() and not st.session_state.get("welcome_splash_shown"):
         show_welcome_splash()
+        st.stop()
 
     # Logo block: shown on every screen, including sign in and the tutorial
     with st.sidebar:
@@ -1279,6 +1767,7 @@ def main():
     # Accounts: signed-out visitors see sign up / log in, new users see the tutorial, and the script
     # stops inside this call until they are done. Everything below runs only for signed-in users.
     user = auth.require_login()
+    projects.redeem_pending_share(user)
 
     with st.sidebar:
         auth.render_account_sidebar(user)  # name, role, replay tutorial, log out
@@ -1294,6 +1783,7 @@ def main():
     )
 
     PAGES[st.session_state["nav"]]()
+    render_copyright_footer()
 
     # Show a brief click ring across the Streamlit app.
     components.html(
