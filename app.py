@@ -1028,7 +1028,15 @@ def page_about():
 
     # Our Story and Mission
     st.header("Our story and mission")
-    st.write("We are building a welcoming starting point for multimodal teaching and making: useful resources, examples, and guidance in one place.")
+    st.write(
+        "The mission of the Multimodal Studio Hub is to support multimodal composition by "
+        "providing a centralized collection of high-quality teaching and learning resources. "
+        "The Hub brings together guides, lesson plans, activities, exemplars, and assessment "
+        "tools that can help instructors and students engage with written, visual, audio, and "
+        "video communication. Through accessible and user-centered resources, the Hub aims to "
+        "foster effective design, critical media literacy, and the creation of meaningful "
+        "digital content for real-world audiences."
+    )
     milestones = [
         ("The idea", "Make multimodal teaching resources easier to find and use."),
         ("The collection", "Bring together guides, activities, exemplars, lesson plans, and rubrics."),
