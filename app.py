@@ -1072,11 +1072,16 @@ def page_about():
     with panel("about-cta"):
         st.header("Ready to explore?")
         st.write("Find a resource for your next project, course, or creative idea.")
-        c1, c2 = st.columns(2)
+        c1, c2, c3 = st.columns(3)
         c1.button("Explore the Resource Library", key="about_library", type="primary",
-                  on_click=go_to, args=("Search Resources",))
+                  on_click=go_to, args=("Search Resources",), use_container_width=True)
         c2.button("Browse Exemplars", key="about_exemplars", on_click=go_to,
-                  args=("Browse Exemplars",))
+                  args=("Browse Exemplars",), use_container_width=True)
+        c3.link_button(
+            "Visit Multimodal Studio Hub on YouTube",
+            "https://youtube.com/@multimodalstudiohub?si=kDx4PdJnNcc1ypE1",
+            use_container_width=True,
+        )
 
 
 # --- Search page helpers: callbacks run before the page reruns, so they can set widget values ---
