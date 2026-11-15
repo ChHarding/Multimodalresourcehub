@@ -1763,7 +1763,7 @@ def show_welcome_splash():
 
     # Show the video immediately with its swivel landing animation; reveal the button two seconds later.
     intro_video = Path("assets/welcome-intro.mp4")
-    video_col, _ = st.columns([3, 1])
+    _, video_col, _ = st.columns([0.5, 3, 0.5])
     with video_col:
         if intro_video.is_file():
             st.video(str(intro_video))
