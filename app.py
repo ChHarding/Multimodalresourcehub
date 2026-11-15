@@ -1027,7 +1027,7 @@ def page_about():
                 st.write(description)
 
     # Our Story and Mission
-    st.header("Our story and mission")
+    st.header("Mission")
     st.write(
         "The mission of the Multimodal Studio Hub is to support multimodal composition by "
         "providing a centralized collection of high-quality teaching and learning resources. "
