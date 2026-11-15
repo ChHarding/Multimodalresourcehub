@@ -1064,12 +1064,6 @@ def page_about():
         {"name": "Team Member Name", "role": "Multimodal Learning",
          "bio": "Supports learning design across written, visual, audio, and video projects.",
          "photo": "assets/team-member-1.jpg"},
-        {"name": "Team Member Name", "role": "Digital Media",
-         "bio": "Helps learners plan, produce, and revise digital media for real audiences.",
-         "photo": "assets/team-member-2.jpg"},
-        {"name": "Team Member Name", "role": "Accessibility and Inclusion",
-         "bio": "Focuses on making multimodal resources clear, usable, and accessible.",
-         "photo": "assets/team-member-3.jpg"},
     ]
     cols = st.columns(len(team))
     for i, (col, member) in enumerate(zip(cols, team), start=1):
