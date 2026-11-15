@@ -1037,6 +1037,16 @@ def page_about():
         "foster effective design, critical media literacy, and the creation of meaningful "
         "digital content for real-world audiences."
     )
+    st.subheader("Goals")
+    st.write("The Multimodal Studio Hub aims to:")
+    st.markdown("""
+    - Increase access to multimodal composition resources for instructors and students.
+    - Curate and organize guides, activities, lesson plans, exemplars, and rubrics that support multimodal instruction.
+    - Facilitate the design, production, and revision of multimodal projects across text, image, audio, and video modes.
+    - Encourage audience-centered communication and digital storytelling practices.
+    - Ensure multimodal resources are accessible, inclusive, and easy to navigate and implement in educational settings.
+    """)
+
     milestones = [
         ("The idea", "Make multimodal teaching resources easier to find and use."),
         ("The collection", "Bring together guides, activities, exemplars, lesson plans, and rubrics."),
