@@ -1071,7 +1071,7 @@ def page_about():
             with card(f"about-team-{i}"):
                 photo = Path(member["photo"])
                 if photo.is_file():
-                    st.image(str(photo), use_container_width=True)
+                    st.image(str(photo), width=200)
                 else:
                     initials = "".join(part[0] for part in member["name"].split()[:2]).upper()
                     st.markdown(f'<div class="team-photo-fallback" role="img" aria-label="Photo placeholder for {esc(member["name"])}">{initials}</div>', unsafe_allow_html=True)
