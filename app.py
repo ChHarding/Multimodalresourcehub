@@ -1834,14 +1834,14 @@ def main():
     )
 
     if user.get("role") == "student" and st.session_state.get("show_student_tutorial_video", False):
-        video_col, _ = st.columns([3, 1])
+        _, video_col, _ = st.columns([0.5, 3, 0.5])
         with video_col:
             st.video("https://www.youtube.com/watch?v=6etcFarw_mc")
             if st.button("Skip video", key="skip_student_tutorial_video"):
                 st.session_state["show_student_tutorial_video"] = False
                 st.rerun()
     elif user.get("role") == "instructor" and st.session_state.get("show_instructor_tutorial_video", False):
-        video_col, _ = st.columns([3, 1])
+        _, video_col, _ = st.columns([0.5, 3, 0.5])
         with video_col:
             st.video("https://youtu.be/BX-O7NU8tWE")
             if st.button("Skip video", key="skip_instructor_tutorial_video"):
