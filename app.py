@@ -1085,7 +1085,7 @@ def page_about():
                         use_container_width=True,
                     )
 
-    st.header("Stay In Touch")
+    st.header("Stay In Touch 📨")
     st.write(
         "**The Multimodal Studio Hub Exchange** is a quarterly newsletter that brings together "
         "the latest research, insights, and developments in multimodal pedagogy. Created for "
