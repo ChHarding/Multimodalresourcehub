@@ -1103,7 +1103,7 @@ def page_about():
     # Call to Action
     st.divider()
     with panel("about-cta"):
-        st.header("Ready to explore?")
+        st.header("Ready to explore? 🔍")
         st.write("Find a resource for your next project, course, or creative idea.")
         c1, c2, c3 = st.columns(3)
         c1.button("Explore the Resource Library", key="about_library", type="primary",
