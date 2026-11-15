@@ -1095,7 +1095,7 @@ def page_about():
     )
     st.link_button(
         "Join the Multimodal Studio Hub Exchange",
-        "mailto:ewuoso@iastate.edu?subject=Join%20the%20Multimodal%20Studio%20Hub%20Exchange",
+        "https://docs.google.com/forms/d/e/1FAIpQLSe2L7FkTtUcSJmzJMy9GFdRzc9KYKTWzVLjJDvmwQ-dsLry3A/viewform?usp=publish-editor",
         type="primary",
         use_container_width=True,
     )
