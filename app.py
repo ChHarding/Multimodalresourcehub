@@ -1079,6 +1079,15 @@ def page_about():
                 st.caption(member["role"])
                 st.write(member["bio"])
 
+    st.header("Stay In Touch")
+    st.write(
+        "**The Multimodal Studio Hub Exchange** is a quarterly newsletter that brings together "
+        "the latest research, insights, and developments in multimodal pedagogy. Created for "
+        "educators in English and communication courses, it offers curated resources, teaching "
+        "inspiration, and opportunities to connect with a growing interdisciplinary community "
+        "of practice."
+    )
+
     # Call to Action
     st.divider()
     with panel("about-cta"):
