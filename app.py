@@ -1062,7 +1062,7 @@ def page_about():
     st.header("About the Multimodal Studio Hub Founder")
     team = [
         {"name": "Meet Isaac", "role": "Multimodal Learning",
-         "bio": "Supports learning design across written, visual, audio, and video projects.",
+         "bio": "I am a PhD student in Rhetoric and Professional Communication (RPC). I am also co-majoring in Human-Computer Interaction (HCI) at Iowa State University in Ames, Iowa. I am passionate about user experience design research, the rhetoric of multiliteracies, and multimodal program evaluation and remediation.",
          "photo": "assets/team-member-1.jpg"},
     ]
     cols = st.columns(len(team))
