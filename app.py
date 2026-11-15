@@ -1775,6 +1775,11 @@ def main():
             video_button_label = "Hide Tutorial Video" if video_is_visible else "Tutorial Video"
             if st.button(video_button_label, key="student_tutorial_video", use_container_width=True):
                 st.session_state["show_student_tutorial_video"] = not video_is_visible
+        elif user.get("role") == "instructor":
+            video_is_visible = st.session_state.get("show_instructor_tutorial_video", False)
+            video_button_label = "Hide Tutorial Video" if video_is_visible else "Tutorial Video"
+            if st.button(video_button_label, key="instructor_tutorial_video", use_container_width=True):
+                st.session_state["show_instructor_tutorial_video"] = not video_is_visible
 
         auth.render_account_sidebar(user)  # name, role, replay tutorial, log out
         st.caption("All content is placeholder data. Replace it in Section 3 of this file.")
@@ -1792,6 +1797,11 @@ def main():
         st.video("https://www.youtube.com/watch?v=6etcFarw_mc")
         if st.button("Skip video", key="skip_student_tutorial_video"):
             st.session_state["show_student_tutorial_video"] = False
+            st.rerun()
+    elif user.get("role") == "instructor" and st.session_state.get("show_instructor_tutorial_video", False):
+        st.video("https://youtu.be/BX-O7NU8tWE")
+        if st.button("Skip video", key="skip_instructor_tutorial_video"):
+            st.session_state["show_instructor_tutorial_video"] = False
             st.rerun()
 
     PAGES[st.session_state["nav"]]()
