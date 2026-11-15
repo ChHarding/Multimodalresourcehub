@@ -1049,7 +1049,7 @@ def page_about():
 
     milestones = [
         ("The idea 🤔", "Make multimodal teaching resources easier to find and use."),
-        ("The collection", "Bring together guides, activities, exemplars, lesson plans, and rubrics."),
+        ("The collection 🧰", "Bring together guides, activities, exemplars, lesson plans, and rubrics."),
         ("What comes next", "Keep growing the library with the needs of learners and instructors in mind."),
     ]
     cols = st.columns(3)
