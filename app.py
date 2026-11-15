@@ -1078,6 +1078,12 @@ def page_about():
                 st.markdown(f'<h3 class="res-title">{esc(member["name"])}</h3>', unsafe_allow_html=True)
                 st.caption(member["role"])
                 st.write(member["bio"])
+                if member["name"] == "Meet Isaac":
+                    st.link_button(
+                        "Contact Me",
+                        "mailto:ewuoso@iastate.edu?subject=Contact%20Isaac",
+                        use_container_width=True,
+                    )
 
     st.header("Stay In Touch")
     st.write(
