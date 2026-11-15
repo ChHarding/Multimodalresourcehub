@@ -1770,6 +1770,13 @@ def main():
     projects.redeem_pending_share(user)
 
     with st.sidebar:
+        if user.get("role") == "student":
+            st.link_button(
+                "Tutorial Video",
+                "https://www.youtube.com/watch?v=6etcFarw_mc",
+                use_container_width=True,
+            )
+
         auth.render_account_sidebar(user)  # name, role, replay tutorial, log out
         st.caption("All content is placeholder data. Replace it in Section 3 of this file.")
 
