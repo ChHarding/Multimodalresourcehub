@@ -1059,7 +1059,7 @@ def page_about():
                 st.markdown(f'<div class="about-timeline"><h3>{heading}</h3><p>{description}</p></div>', unsafe_allow_html=True)
 
     # Meet the Team. Replace names, bios, and photo paths with your team details.
-    st.header("Meet Isaac")
+    st.header("About the Multimodal Hub Studio Founder")
     team = [
         {"name": "Team Member Name", "role": "Multimodal Learning",
          "bio": "Supports learning design across written, visual, audio, and video projects.",
