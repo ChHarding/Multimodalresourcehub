@@ -1037,7 +1037,7 @@ def page_about():
         "foster effective design, critical media literacy, and the creation of meaningful "
         "digital content for real-world audiences."
     )
-    st.subheader("Goals")
+    st.subheader("Goals 🎯")
     st.write("The Multimodal Studio Hub aims to:")
     st.markdown("""
     - Increase access to multimodal composition resources for instructors and students.
