@@ -1061,7 +1061,7 @@ def page_about():
     # Meet the Team. Replace names, bios, and photo paths with your team details.
     st.header("About the Multimodal Studio Hub Founder")
     team = [
-        {"name": "Team Member Name", "role": "Multimodal Learning",
+        {"name": "Meet Isaac", "role": "Multimodal Learning",
          "bio": "Supports learning design across written, visual, audio, and video projects.",
          "photo": "assets/team-member-1.jpg"},
     ]
