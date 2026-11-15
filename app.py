@@ -1087,6 +1087,12 @@ def page_about():
         "inspiration, and opportunities to connect with a growing interdisciplinary community "
         "of practice."
     )
+    st.link_button(
+        "Join the Multimodal Studio Hub Exchange",
+        "mailto:ewuoso@iastate.edu?subject=Join%20the%20Multimodal%20Studio%20Hub%20Exchange",
+        type="primary",
+        use_container_width=True,
+    )
 
     # Call to Action
     st.divider()
