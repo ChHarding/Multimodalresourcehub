@@ -424,7 +424,7 @@ def render_onboarding(user):
 def render_copyright_footer():
     """Show the same copyright notice on authentication and onboarding screens."""
     st.markdown(
-        '<footer class="site-footer">Copyright &copy; 2026 The Multimodal Studio Hub. All Rights Reserved</footer>',
+        '<footer class="site-footer">Copyright &copy; 2026 The Multimodal Studio Hub. All Rights Reserved&nbsp;&nbsp;<a href="https://youtube.com/@multimodalstudiohub?si=kDx4PdJnNcc1ypE1" target="_blank" rel="noopener noreferrer" aria-label="Visit Multimodal Studio Hub on YouTube" title="Visit Multimodal Studio Hub on YouTube" style="display:inline-flex;align-items:center;vertical-align:middle;color:#FF0000;text-decoration:none;"><svg aria-hidden="true" width="24" height="17" viewBox="0 0 24 17" xmlns="http://www.w3.org/2000/svg" style="display:block;"><rect width="24" height="17" rx="4" fill="#FF0000"/><path d="M10 4.5L16 8.5L10 12.5V4.5Z" fill="#FFFFFF"/></svg></a></footer>',
         unsafe_allow_html=True,
     )
 
