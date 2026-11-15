@@ -1771,11 +1771,10 @@ def main():
 
     with st.sidebar:
         if user.get("role") == "student":
-            st.link_button(
-                "Tutorial Video",
-                "https://www.youtube.com/watch?v=6etcFarw_mc",
-                use_container_width=True,
-            )
+            if st.button("Tutorial Video", key="student_tutorial_video", use_container_width=True):
+                st.session_state["show_student_tutorial_video"] = not st.session_state.get(
+                    "show_student_tutorial_video", False
+                )
 
         auth.render_account_sidebar(user)  # name, role, replay tutorial, log out
         st.caption("All content is placeholder data. Replace it in Section 3 of this file.")
@@ -1788,6 +1787,9 @@ def main():
         horizontal=True,
         label_visibility="collapsed",
     )
+
+    if user.get("role") == "student" and st.session_state.get("show_student_tutorial_video", False):
+        st.video("https://www.youtube.com/watch?v=6etcFarw_mc")
 
     PAGES[st.session_state["nav"]]()
     render_copyright_footer()
