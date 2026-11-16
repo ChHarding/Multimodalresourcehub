@@ -13,6 +13,7 @@ File layout (top to bottom):
   6. Router and sidebar (main), which calls auth.require_login() before any page is shown
 """
 
+import base64
 import html
 import io
 import re
