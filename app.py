@@ -1796,12 +1796,18 @@ def main():
 
     # Logo block: shown on every screen, including sign in and the tutorial
     with st.sidebar:
-        # Logo placeholder: swap the "MS" block for your real logo (for example st.image) when you have one
-        st.markdown(
-            '<div class="logo-row"><img class="logo-image" src="https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/msh-logo.jpg" alt="Multimodal Studio Hub logo">'
-            '<div><div class="brand">Multimodal Studio Hub</div><div class="tagline">Teaching resources for multimodal projects</div></div></div>',
-            unsafe_allow_html=True,
-        )
+        logo_col, brand_col = st.columns([1, 3])
+        with logo_col:
+            st.image(
+                str(Path(__file__).resolve().parent / "assets" / "msh-logo.jpg"),
+                width=56,
+            )
+        with brand_col:
+            st.markdown(
+                '<div class="brand">Multimodal Studio Hub</div>'
+                '<div class="tagline">Teaching resources for multimodal projects</div>',
+                unsafe_allow_html=True,
+            )
 
     # Accounts: signed-out visitors see sign up / log in, new users see the tutorial, and the script
     # stops inside this call until they are done. Everything below runs only for signed-in users.
