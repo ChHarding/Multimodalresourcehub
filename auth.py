@@ -618,35 +618,104 @@ def render_auth_page():
     logo_path = Path(__file__).resolve().parent / "assets" / "msh-logo.jpg"
     if logo_path.is_file():
         logo_data = base64.b64encode(logo_path.read_bytes()).decode("ascii")
-        components.html(
-            f"""
-            <style>
-              @keyframes msh-logo-spin {{
-                to {{ transform: rotate(360deg); }}
-              }}
-              .msh-logo {{
-                display: block;
-                width: 150px;
-                height: 150px;
-                margin: 8px auto;
-                object-fit: contain;
-                animation: msh-logo-spin 8s linear infinite;
-              }}
-              @media (prefers-reduced-motion: reduce) {{
-                .msh-logo {{ animation: none; }}
-              }}
-            </style>
-            <div style="display:flex; justify-content:center; align-items:center;">
-              <img
-                class="msh-logo"
-                src="data:image/jpeg;base64,{logo_data}"
-                alt="Multimodal Studio Hub logo"
-              />
-            </div>
-            """,
-            height=170,
-            scrolling=False,
-        )
+        sphere_html = """
+        <style>
+          #msh-logo-sphere {
+            display: block;
+            width: 160px;
+            height: 160px;
+            margin: 8px auto;
+          }
+          #msh-logo-texture { display: none; }
+        </style>
+        <div style="display:flex; justify-content:center; align-items:center;">
+          <canvas id="msh-logo-sphere" width="180" height="180"
+                  role="img" aria-label="Rotating Multimodal Studio Hub logo"></canvas>
+          <img id="msh-logo-texture"
+               src="data:image/jpeg;base64,__LOGO_DATA__"
+               alt="" />
+        </div>
+        <script>
+          const logoImage = document.getElementById("msh-logo-texture");
+          const sphereCanvas = document.getElementById("msh-logo-sphere");
+          const sphereContext = sphereCanvas.getContext("2d");
+          const textureCanvas = document.createElement("canvas");
+          const textureContext = textureCanvas.getContext("2d");
+
+          function startLogoSphere() {
+            textureCanvas.width = logoImage.naturalWidth;
+            textureCanvas.height = logoImage.naturalHeight;
+            textureContext.drawImage(logoImage, 0, 0);
+            const texture = textureContext.getImageData(
+              0, 0, textureCanvas.width, textureCanvas.height
+            );
+            const output = sphereContext.createImageData(
+              sphereCanvas.width, sphereCanvas.height
+            );
+            const source = texture.data;
+            const pixels = output.data;
+            const size = sphereCanvas.width;
+            const radius = size / 2;
+            const lightX = -0.35;
+            const lightY = 0.45;
+            const lightZ = 0.82;
+
+            function render(angle) {
+              for (let y = 0; y < size; y++) {
+                const ny = (radius - y - 0.5) / radius;
+                for (let x = 0; x < size; x++) {
+                  const nx = (x + 0.5 - radius) / radius;
+                  const distanceSquared = nx * nx + ny * ny;
+                  const outputIndex = (y * size + x) * 4;
+                  if (distanceSquared > 1) {
+                    pixels[outputIndex + 3] = 0;
+                    continue;
+                  }
+
+                  const nz = Math.sqrt(1 - distanceSquared);
+                  const longitude = Math.atan2(nx, nz) + angle;
+                  const u = ((longitude / (2 * Math.PI) + 0.5) % 1 + 1) % 1;
+                  const latitude = Math.asin(ny);
+                  const v = Math.max(0, Math.min(1, 0.5 - latitude / Math.PI));
+                  const sourceX = Math.min(textureCanvas.width - 1, Math.floor(u * textureCanvas.width));
+                  const sourceY = Math.min(textureCanvas.height - 1, Math.floor(v * textureCanvas.height));
+                  const sourceIndex = (sourceY * textureCanvas.width + sourceX) * 4;
+
+                  const illumination = Math.max(
+                    0,
+                    nx * lightX + ny * lightY + nz * lightZ
+                  );
+                  const shade = 0.28 + 0.72 * illumination;
+                  const highlight = Math.pow(illumination, 24) * 0.2;
+                  pixels[outputIndex] = Math.min(255, source[sourceIndex] * shade + 255 * highlight);
+                  pixels[outputIndex + 1] = Math.min(255, source[sourceIndex + 1] * shade + 255 * highlight);
+                  pixels[outputIndex + 2] = Math.min(255, source[sourceIndex + 2] * shade + 255 * highlight);
+                  pixels[outputIndex + 3] = Math.min(255, Math.round((1 - Math.sqrt(distanceSquared)) * radius * 2 + 127));
+                }
+              }
+              sphereContext.putImageData(output, 0, 0);
+            }
+
+            render(0);
+            if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+              const startTime = performance.now();
+              function animate(now) {
+                const angle = ((now - startTime) / 8000) * 2 * Math.PI;
+                render(angle);
+                requestAnimationFrame(animate);
+              }
+              requestAnimationFrame(animate);
+            }
+          }
+
+          if (logoImage.complete && logoImage.naturalWidth) {
+            startLogoSphere();
+          } else {
+            logoImage.onload = startLogoSphere;
+          }
+        </script>
+        """.replace("__LOGO_DATA__", logo_data)
+        components.html(sphere_html, height=180, scrolling=False)
 
     tab_login, tab_signup = st.tabs(["Log in", "Sign up"])
     with tab_login:
