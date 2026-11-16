@@ -615,6 +615,39 @@ def render_auth_page():
     else:
         st.warning("Welcome music is unavailable right now.")
 
+    logo_path = Path(__file__).resolve().parent / "assets" / "msh-logo.jpg"
+    if logo_path.is_file():
+        logo_data = base64.b64encode(logo_path.read_bytes()).decode("ascii")
+        components.html(
+            f"""
+            <style>
+              @keyframes msh-logo-spin {{
+                to {{ transform: rotate(360deg); }}
+              }}
+              .msh-logo {{
+                display: block;
+                width: 150px;
+                height: 150px;
+                margin: 8px auto;
+                object-fit: contain;
+                animation: msh-logo-spin 8s linear infinite;
+              }}
+              @media (prefers-reduced-motion: reduce) {{
+                .msh-logo {{ animation: none; }}
+              }}
+            </style>
+            <div style="display:flex; justify-content:center; align-items:center;">
+              <img
+                class="msh-logo"
+                src="data:image/jpeg;base64,{logo_data}"
+                alt="Multimodal Studio Hub logo"
+              />
+            </div>
+            """,
+            height=170,
+            scrolling=False,
+        )
+
     tab_login, tab_signup = st.tabs(["Log in", "Sign up"])
     with tab_login:
         render_login_form()
