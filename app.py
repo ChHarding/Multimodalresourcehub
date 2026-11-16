@@ -78,8 +78,7 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 /* Sidebar: lavender, logo, and navigation links */
 [data-testid="stSidebar"] { background: var(--lavender); border-right: 1px solid var(--line); }
 [data-testid="stSidebar"] .logo-row { display: flex; align-items: center; gap: var(--s3); margin: var(--s2) 0 var(--s5); }
-[data-testid="stSidebar"] .logo { position: relative; width: 44px; height: 44px; flex: none; border-radius: 12px; background: var(--plum); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 1.1rem; }
-[data-testid="stSidebar"] .logo::after { content: ""; position: absolute; right: -4px; bottom: -4px; width: 14px; height: 14px; border-radius: 50%; background: var(--coral); border: 2px solid var(--lavender); }
+[data-testid="stSidebar"] .logo-image { width: 58px; height: 58px; flex: none; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
 [data-testid="stSidebar"] .brand { font-family: 'Fraunces', Georgia, serif; font-size: 1.2rem; font-weight: 700; color: var(--plum); line-height: 1.15; }
 [data-testid="stSidebar"] .tagline { font-size: .85rem; color: var(--muted); margin-top: 2px; }
 [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] { gap: 4px; }
@@ -1799,7 +1798,7 @@ def main():
     with st.sidebar:
         # Logo placeholder: swap the "MS" block for your real logo (for example st.image) when you have one
         st.markdown(
-            '<div class="logo-row"><div class="logo" role="img" aria-label="Logo placeholder">MS</div>'
+            '<div class="logo-row"><img class="logo-image" src="https://raw.githubusercontent.com/ewuoso-lgtm/Multimodalresourcehub/main/assets/msh-logo.jpg" alt="Multimodal Studio Hub logo">'
             '<div><div class="brand">Multimodal Studio Hub</div><div class="tagline">Teaching resources for multimodal projects</div></div></div>',
             unsafe_allow_html=True,
         )
