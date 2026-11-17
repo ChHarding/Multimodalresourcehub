@@ -933,6 +933,23 @@ def page_home():
         st.write_stream(typewriter_chunks(f"{greeting}{blurb}"))
         st.markdown(f'<div class="chips">{chips}</div>', unsafe_allow_html=True)
 
+    st.header("Why Multimodal Studio Hub?")
+    st.markdown("""
+In Michael Jackson’s *Smooth Criminal*, the protagonist enters a speakeasy-like salon cloaked in stillness. The atmosphere is quiet, subdued, and almost lifeless. Then, with a simple flick of his hand, he sends a coin spinning through the air. The coin arcs across the room and lands precisely in a jukebox. In an instant, everything changes.
+
+The room comes alive. Music fills the space. Movement replaces stillness. Personalities emerge. People dance, interact, and express themselves through rhythm, gesture, costume, sound, and performance. What was once a muted environment becomes a vibrant scene rich with energy, creativity, and human expression.
+
+At the center of this transformation is a seemingly ordinary artifact: a coin. Yet that small object serves as a catalyst, triggering a chain reaction that remixes the entire environment. The coin does not create the people, the music, or the energy on its own. Rather, it unlocks possibilities that were already waiting to be activated.
+
+That image inspires the vision behind the **Multimodal Studio Hub.**
+
+The Multimodal Studio Hub is designed to be that catalyst. It is a place where a seemingly ordinary idea, draft, assignment, or text can be transformed through the thoughtful use of multiple modes of communication. A piece of writing need not remain static or confined to words alone. Through sound, visuals, gesture, design, movement, spatial arrangement, and digital media, it can be remixed into something more engaging, impactful, and meaningful.
+
+The Hub seeks to help students and instructors of English communication recognize and leverage the affordances of different communicative modes, from linguistic and visual expression to audio, oral, embodied, and interactive forms. By bringing together resources, exemplars, tools, and pedagogical practices, the Hub aims to spark creativity, encourage experimentation, and breathe new life into multimodal composing.
+
+Just as a single coin sets an entire room in motion in *Smooth Criminal,* the Multimodal Studio Hub seeks to provide the inspiration, resources, and momentum that transform an initial idea into a rich and dynamic multimodal creation in a digital space.
+    """)
+
     # Calls to action under the hero (one primary, one secondary)
     c1, c2, _ = st.columns([1, 1, 2])
     if instructor:
