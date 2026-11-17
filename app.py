@@ -1853,14 +1853,24 @@ def show_welcome_splash():
             st.video("https://www.youtube.com/watch?v=j28H9btX5vs")
 
     time.sleep(2)
-    left, center, right = st.columns([1, 1.4, 1])
-    if center.button(
+    left, begin_col, learn_col, right = st.columns([1, 1.4, 1.2, 1])
+
+    if begin_col.button(
         "▶ Begin Here",
         key="welcome_begin",
         type="primary",
         use_container_width=True,
     ):
         st.session_state["welcome_splash_shown"] = True
+        st.rerun()
+
+    if learn_col.button(
+        "Learn More",
+        key="welcome_learn_more",
+        use_container_width=True,
+    ):
+        st.session_state["welcome_splash_shown"] = True
+        st.session_state["nav"] = "About"
         st.rerun()
 
     render_copyright_footer()
