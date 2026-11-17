@@ -940,9 +940,17 @@ In Michael Jackson’s *Smooth Criminal*, the protagonist enters a speakeasy-lik
 The room comes alive. Music fills the space. Movement replaces stillness. Personalities emerge. People dance, interact, and express themselves through rhythm, gesture, costume, sound, and performance. What was once a muted environment becomes a vibrant scene rich with energy, creativity, and human expression.
 
 At the center of this transformation is a seemingly ordinary artifact: a coin. Yet that small object serves as a catalyst, triggering a chain reaction that remixes the entire environment. The coin does not create the people, the music, or the energy on its own. Rather, it unlocks possibilities that were already waiting to be activated.
+    """)
 
-That image inspires the vision behind the **Multimodal Studio Hub.**
+    vision_text_col, vision_logo_col = st.columns([3, 1.2], vertical_alignment="center")
+    with vision_text_col:
+        st.markdown("That image inspires the vision behind the **Multimodal Studio Hub.**")
+    with vision_logo_col:
+        logo_path = Path(__file__).resolve().parent / "assets" / "msh-logo.jpg"
+        if logo_path.is_file():
+            st.image(str(logo_path), width=220, caption="Multimodal Studio Hub")
 
+    st.markdown("""
 The Multimodal Studio Hub is designed to be that catalyst. It is a place where a seemingly ordinary idea, draft, assignment, or text can be transformed through the thoughtful use of multiple modes of communication. A piece of writing need not remain static or confined to words alone. Through sound, visuals, gesture, design, movement, spatial arrangement, and digital media, it can be remixed into something more engaging, impactful, and meaningful.
 
 The Hub seeks to help students and instructors of English communication recognize and leverage the affordances of different communicative modes, from linguistic and visual expression to audio, oral, embodied, and interactive forms. By bringing together resources, exemplars, tools, and pedagogical practices, the Hub aims to spark creativity, encourage experimentation, and breathe new life into multimodal composing.
