@@ -147,15 +147,20 @@ def core_message_feedback(api_key, source_mode, source_summary, learner_core, au
          'author_intent': author_intent, 'learner_core': _clip(learner_core)})
 
 
-def transduction_plan_feedback(api_key, source_mode, target_mode, core, plan):
-    """Stage 2: critique a plan or storyboard for what is kept, lost, and gained."""
-    return _reply(api_key,
-        BASE + "Evaluate the learner's PLAN for the target mode. Check what is preserved from the "
+def _plan_args(source_mode, target_mode, core, plan):
+    system = (BASE + "Evaluate the learner's PLAN for the target mode. Check what is preserved from the "
         "core, what is lost, and what the mode newly gains. Identify the single biggest mismatch "
         "between the plan and the mode's affordances/constraints, naming the lens it falls under. "
-        "Note one strength. End with one suggested design move, not a rewrite.",
-        {'source_mode': source_mode, 'target_mode': _profile(target_mode),
-         'core': _clip(core), 'learner_plan': _clip(plan)})
+        "Note one strength. End with one suggested design move, not a rewrite.")
+    context = {'source_mode': source_mode, 'target_mode': _profile(target_mode),
+               'core': _clip(core), 'learner_plan': _clip(plan)}
+    return system, context
+
+
+def transduction_plan_feedback(api_key, source_mode, target_mode, core, plan):
+    """Stage 2: critique a plan or storyboard for what is kept, lost, and gained."""
+    system, context = _plan_args(source_mode, target_mode, core, plan)
+    return _reply(api_key, system, context)
 
 
 def design_rationale_feedback(api_key, target_mode, core, design_choice, rationale):
@@ -171,6 +176,18 @@ def design_rationale_feedback(api_key, target_mode, core, design_choice, rationa
          'design_choice': _clip(design_choice), 'learner_rationale': _clip(rationale)})
 
 
+def _draft_args(source_mode, target_mode, core, draft_description, focus):
+    lens = (f"Focus on the {focus} lens only. " if focus in LENSES else
+            "Give one observation per lens only if each is warranted. ")
+    system = (BASE + "Give feedback on the learner's draft against the core and the target mode. " + lens +
+        "Also check whether the draft is accessible to varied audiences (alt text, captions or "
+        "transcript, contrast, readable structure) and mention it only if a gap exists. Keep to 3 "
+        "short sentences: one strength, one priority revision, one question.")
+    context = {'source_mode': source_mode, 'target_mode': _profile(target_mode),
+               'core': _clip(core), 'draft': _clip(draft_description), 'focus': focus}
+    return system, context
+
+
 def draft_feedback(api_key, source_mode, target_mode, core, draft_description, focus=None):
     """Stage 4: feedback on a draft described or transcribed in text.
 
@@ -179,13 +196,81 @@ def draft_feedback(api_key, source_mode, target_mode, core, draft_description, f
     audio review, route the file to a vision/audio-capable model first.
     focus: None, or one of 'ideational', 'interpersonal', 'textual'.
     """
-    lens = (f"Focus on the {focus} lens only. " if focus in LENSES else
-            "Give one observation per lens only if each is warranted. ")
-    return _reply(api_key,
-        BASE + "Give feedback on the learner's draft against the core and the target mode. " + lens +
-        "Also check whether the draft is accessible to varied audiences (alt text, captions or "
-        "transcript, contrast, readable structure) and mention it only if a gap exists. Keep to 3 "
-        "short sentences: one strength, one priority revision, one question.",
-        {'source_mode': source_mode, 'target_mode': _profile(target_mode),
-         'core': _clip(core), 'draft': _clip(draft_description), 'focus': focus},
-        max_tokens=500)
+    system, context = _draft_args(source_mode, target_mode, core, draft_description, focus)
+    return _reply(api_key, system, context, max_tokens=500)
+
+
+# ---------------------------------------------------------------------------
+# Scored feedback: text feedback plus a short JSON score per lens, for tracking
+# growth across revisions.
+# ---------------------------------------------------------------------------
+RUBRIC_VERSION = 1
+RUBRIC = (
+    "Also score the learner's work on each lens from 1 to 4: 1 = absent or unclear; "
+    "2 = emerging (present but inconsistent or generic); 3 = proficient (clear, fits the "
+    "mode, supports the core); 4 = strong (deliberate, mode-specific, and clearly serves the "
+    "core and audience). Use null for a lens when the learner text gives too little evidence. "
+    "Score only what the learner supplied, not what they might intend. "
+    "Return ONLY one JSON object, with no markdown fences and no extra text, shaped exactly as "
+    '{"feedback": "<your feedback, following the instructions above>", '
+    '"scores": {"ideational": 1-4 or null, "interpersonal": 1-4 or null, "textual": 1-4 or null}}.'
+)
+
+
+def _parse_scored(raw):
+    """Parse the model's JSON defensively. Falls back to text-only with null scores."""
+    empty = {lens: None for lens in LENSES}
+    try:
+        data = json.loads(raw[raw.index('{'):raw.rindex('}') + 1])
+        scores = {}
+        for lens in LENSES:
+            v = (data.get('scores') or {}).get(lens)
+            scores[lens] = min(4, max(1, int(v))) if isinstance(v, (int, float)) else None
+        feedback = str(data.get('feedback', '')).strip()
+        if feedback:
+            return {'feedback': feedback, 'scores': scores, 'parsed': True,
+                    'rubric_version': RUBRIC_VERSION}
+    except (ValueError, TypeError, AttributeError):
+        pass
+    return {'feedback': raw, 'scores': empty, 'parsed': False, 'rubric_version': RUBRIC_VERSION}
+
+
+def _scored_reply(api_key, system, context, max_tokens=700):
+    return _parse_scored(_reply(api_key, system + " " + RUBRIC, context, max_tokens=max_tokens))
+
+
+def transduction_plan_feedback_scored(api_key, source_mode, target_mode, core, plan):
+    """Plan feedback plus {'ideational','interpersonal','textual'} scores (1-4 or None)."""
+    system, context = _plan_args(source_mode, target_mode, core, plan)
+    return _scored_reply(api_key, system, context)
+
+
+def draft_feedback_scored(api_key, source_mode, target_mode, core, draft_description, focus=None):
+    """Draft feedback plus per-lens scores. Returns:
+    {'feedback': str, 'scores': {lens: int|None}, 'parsed': bool, 'rubric_version': int}
+    Store one record per revision (see score_delta / growth_summary)."""
+    system, context = _draft_args(source_mode, target_mode, core, draft_description, focus)
+    return _scored_reply(api_key, system, context)
+
+
+def score_delta(previous, current):
+    """Per-lens change between two score dicts; None where either score is missing."""
+    previous, current = previous or {}, current or {}
+    out = {}
+    for lens in LENSES:
+        a, b = previous.get(lens), current.get(lens)
+        out[lens] = None if a is None or b is None else b - a
+    return out
+
+
+def growth_summary(history):
+    """history: list of score dicts, oldest to newest (e.g., one per revision).
+    Returns first, latest, and change for each lens, using only scored revisions."""
+    summary = {}
+    for lens in LENSES:
+        seen = [h[lens] for h in history if h.get(lens) is not None]
+        summary[lens] = {'first': seen[0] if seen else None,
+                         'latest': seen[-1] if seen else None,
+                         'change': (seen[-1] - seen[0]) if len(seen) > 1 else None,
+                         'n': len(seen)}
+    return summary
