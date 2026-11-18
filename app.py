@@ -934,9 +934,17 @@ def page_home():
         st.markdown(f'<div class="chips">{chips}</div>', unsafe_allow_html=True)
 
     st.header("Why Multimodal Studio Hub?")
-    st.markdown("""
+    opening_text_col, coin_toss_gif_col = st.columns([3, 2], vertical_alignment="top")
+    with opening_text_col:
+        st.markdown("""
 In Michael Jackson’s *Smooth Criminal*, the protagonist enters a speakeasy-like salon cloaked in stillness. The atmosphere is quiet, subdued, and almost lifeless. Then, with a simple flick of his hand, he sends a coin spinning through the air. The coin arcs across the room and lands precisely in a jukebox. In an instant, everything changes.
+        """)
+    with coin_toss_gif_col:
+        coin_toss_gif = Path(__file__).resolve().parent / "assets" / "smooth-criminal-coin-toss.gif"
+        if coin_toss_gif.is_file():
+            st.image(str(coin_toss_gif), width=240, caption="Smooth Criminal coin toss")
 
+    st.markdown("""
 The room comes alive. Music fills the space. Movement replaces stillness. Personalities emerge. People dance, interact, and express themselves through rhythm, gesture, costume, sound, and performance. What was once a muted environment becomes a vibrant scene rich with energy, creativity, and human expression.
 
 At the center of this transformation is a seemingly ordinary artifact: a coin. Yet that small object serves as a catalyst, triggering a chain reaction that remixes the entire environment. The coin does not create the people, the music, or the energy on its own. Rather, it unlocks possibilities that were already waiting to be activated.
