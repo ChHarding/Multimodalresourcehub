@@ -965,6 +965,10 @@ def render_projects_page(user):
         st.write_stream(_project_typewriter(
             "Build a multimodal page with your team, share it, and see who contributed what."
         ))
+
+    if st.button("Multimodal Tutor Buddy", key="open_multimodal_tutor_buddy"):
+        st.info("Multimodal Tutor Buddy is coming soon.")
+
     pid = st.session_state.get("open_project")
     if pid:
         project, role = get_project(pid), get_role(pid, user["id"])
