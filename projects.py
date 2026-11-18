@@ -1130,6 +1130,36 @@ def render_projects_page(user):
             "Build a multimodal page with your team, share it, and see who contributed what."
         ))
 
+    st.markdown("""
+    <style>
+    @keyframes tutor-buddy-glow {
+      0%, 100% {
+        box-shadow: 0 0 8px 2px rgba(255, 107, 91, .45);
+      }
+      50% {
+        box-shadow: 0 0 18px 6px rgba(255, 107, 91, .75);
+      }
+    }
+
+    .st-key-open_multimodal_tutor_buddy {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .st-key-open_multimodal_tutor_buddy button {
+      min-width: 260px;
+      animation: tutor-buddy-glow 1.8s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .st-key-open_multimodal_tutor_buddy button {
+        animation: none;
+      }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     buddy_is_open = st.session_state.get("show_multimodal_tutor_buddy", False)
     buddy_label = "Hide Multimodal Tutor Buddy" if buddy_is_open else "Multimodal Tutor Buddy"
     if st.button(buddy_label, key="open_multimodal_tutor_buddy"):
