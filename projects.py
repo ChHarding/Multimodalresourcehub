@@ -45,6 +45,7 @@ import pandas as pd
 import streamlit as st
 
 import auth
+import multimodal_tutor as tutor
 
 # ---------------------------------------------------------------------------
 # 1. SETTINGS
@@ -957,6 +958,169 @@ def _project_typewriter(text, delay=0.012):
         time.sleep(delay)
 
 
+def _tutor_api_key():
+    """Read the tutor's secret without exposing it in the interface."""
+    try:
+        return str(st.secrets.get("GROQ_API_KEY", "")).strip()
+    except Exception:
+        return ""
+
+
+def _run_tutor_feedback(result_key, feedback_function, *args, **kwargs):
+    """Call one tutor feedback stage and keep its response in the current session."""
+    api_key = _tutor_api_key()
+    if not api_key:
+        st.error("Tutor Buddy is not configured yet. The site administrator must add GROQ_API_KEY to Streamlit secrets.")
+        return
+
+    st.session_state.pop(result_key, None)
+    try:
+        with st.spinner("Tutor Buddy is thinking..."):
+            st.session_state[result_key] = feedback_function(api_key, *args, **kwargs)
+    except Exception:
+        st.error("Tutor Buddy could not get feedback right now. Please try again in a moment.")
+
+
+def _show_tutor_feedback(result_key):
+    """Show the latest feedback returned for a tutor stage."""
+    feedback = st.session_state.get(result_key)
+    if feedback:
+        st.markdown("**Tutor Buddy feedback**")
+        st.write(feedback)
+
+
+def render_multimodal_tutor_buddy():
+    """Collect project context and render the tutor's four feedback stages."""
+    st.subheader("Multimodal Tutor Buddy")
+    st.write("Get formative feedback as you adapt a project from one mode to another.")
+    st.caption("Your submitted text is sent to Groq to generate feedback. Avoid including names or sensitive personal information.")
+
+    source_mode = st.text_input(
+        "What mode is your original work in?",
+        value="Essay",
+        max_chars=100,
+        key="tutor_source_mode",
+        help="For example: essay, report, speech, or research paper.",
+    )
+    target_mode = st.selectbox(
+        "What mode are you moving it into?",
+        options=list(tutor.MODES),
+        format_func=lambda mode: tutor.MODES[mode]["label"],
+        key="tutor_target_mode",
+    )
+    source_summary = st.text_area(
+        "Summarize the original work",
+        max_chars=tutor.MAX_LEARNER_CHARS,
+        key="tutor_source_summary",
+        help="Include the purpose, audience, main claim, and important supporting material.",
+    )
+    learner_core = st.text_area(
+        "What core message do you want to carry forward?",
+        max_chars=tutor.MAX_LEARNER_CHARS,
+        key="tutor_learner_core",
+        help="Describe the purpose, audience, main claim, and what matters most.",
+    )
+
+    with st.expander("Feedback stages", expanded=True):
+        with st.form("tutor_core_feedback_form"):
+            author_intent = st.text_area(
+                "What did you intend readers or viewers to take away? (optional)",
+                max_chars=500,
+                key="tutor_author_intent",
+            )
+            submit_core = st.form_submit_button("1. Check my core message")
+        if submit_core:
+            if not source_mode.strip() or not source_summary.strip() or not learner_core.strip():
+                st.warning("Enter your source mode, source summary, and core message first.")
+            else:
+                _run_tutor_feedback(
+                    "tutor_core_feedback",
+                    tutor.core_message_feedback,
+                    source_mode,
+                    source_summary,
+                    learner_core,
+                    author_intent or None,
+                )
+        _show_tutor_feedback("tutor_core_feedback")
+
+        with st.form("tutor_plan_feedback_form"):
+            learner_plan = st.text_area(
+                "Describe your plan for the new mode",
+                max_chars=tutor.MAX_LEARNER_CHARS,
+                key="tutor_learner_plan",
+            )
+            submit_plan = st.form_submit_button("2. Review my transduction plan")
+        if submit_plan:
+            if not source_mode.strip() or not source_summary.strip() or not learner_core.strip() or not learner_plan.strip():
+                st.warning("Complete the source details, core message, and plan first.")
+            else:
+                _run_tutor_feedback(
+                    "tutor_plan_feedback",
+                    tutor.transduction_plan_feedback,
+                    source_mode,
+                    target_mode,
+                    learner_core,
+                    learner_plan,
+                )
+        _show_tutor_feedback("tutor_plan_feedback")
+
+        with st.form("tutor_rationale_feedback_form"):
+            design_choice = st.text_input(
+                "What is one design choice you made?",
+                max_chars=500,
+                key="tutor_design_choice",
+            )
+            rationale = st.text_area(
+                "Why does that choice fit your message, audience, or target mode?",
+                max_chars=tutor.MAX_LEARNER_CHARS,
+                key="tutor_design_rationale",
+            )
+            submit_rationale = st.form_submit_button("3. Review my design rationale")
+        if submit_rationale:
+            if not learner_core.strip() or not design_choice.strip() or not rationale.strip():
+                st.warning("Enter your core message, one design choice, and your rationale first.")
+            else:
+                _run_tutor_feedback(
+                    "tutor_rationale_feedback",
+                    tutor.design_rationale_feedback,
+                    target_mode,
+                    learner_core,
+                    design_choice,
+                    rationale,
+                )
+        _show_tutor_feedback("tutor_rationale_feedback")
+
+        with st.form("tutor_draft_feedback_form"):
+            draft_description = st.text_area(
+                "Describe or transcribe your draft",
+                max_chars=tutor.MAX_LEARNER_CHARS,
+                key="tutor_draft_description",
+                help="You can describe a storyboard, layout, image, audio plan, or transcript. This tutor reviews text descriptions, not image or audio files directly.",
+            )
+            lens_options = ["All lenses", *tutor.LENSES.keys()]
+            focus_choice = st.selectbox(
+                "Feedback focus",
+                options=lens_options,
+                key="tutor_draft_focus",
+                format_func=lambda focus: focus.replace("_", " ").title(),
+            )
+            submit_draft = st.form_submit_button("4. Review my draft")
+        if submit_draft:
+            if not source_mode.strip() or not source_summary.strip() or not learner_core.strip() or not draft_description.strip():
+                st.warning("Complete the source details, core message, and draft description first.")
+            else:
+                _run_tutor_feedback(
+                    "tutor_draft_feedback",
+                    tutor.draft_feedback,
+                    source_mode,
+                    target_mode,
+                    learner_core,
+                    draft_description,
+                    None if focus_choice == "All lenses" else focus_choice,
+                )
+        _show_tutor_feedback("tutor_draft_feedback")
+
+
 def render_projects_page(user):
     """The body of the Project Spaces sidebar page."""
     init_db()
@@ -966,8 +1130,12 @@ def render_projects_page(user):
             "Build a multimodal page with your team, share it, and see who contributed what."
         ))
 
-    if st.button("Multimodal Tutor Buddy", key="open_multimodal_tutor_buddy"):
-        st.info("Multimodal Tutor Buddy is coming soon.")
+    buddy_is_open = st.session_state.get("show_multimodal_tutor_buddy", False)
+    buddy_label = "Hide Multimodal Tutor Buddy" if buddy_is_open else "Multimodal Tutor Buddy"
+    if st.button(buddy_label, key="open_multimodal_tutor_buddy"):
+        st.session_state["show_multimodal_tutor_buddy"] = not buddy_is_open
+    if st.session_state.get("show_multimodal_tutor_buddy", False):
+        render_multimodal_tutor_buddy()
 
     pid = st.session_state.get("open_project")
     if pid:
