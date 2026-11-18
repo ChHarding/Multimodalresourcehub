@@ -13,6 +13,7 @@ File layout (top to bottom):
   6. Router and sidebar (main), which calls auth.require_login() before any page is shown
 """
 
+import base64
 import html
 import io
 import re
@@ -78,8 +79,7 @@ h1, h2, h3, h4, h5 { font-family: 'Fraunces', Georgia, serif !important; color: 
 /* Sidebar: lavender, logo, and navigation links */
 [data-testid="stSidebar"] { background: var(--lavender); border-right: 1px solid var(--line); }
 [data-testid="stSidebar"] .logo-row { display: flex; align-items: center; gap: var(--s3); margin: var(--s2) 0 var(--s5); }
-[data-testid="stSidebar"] .logo { position: relative; width: 44px; height: 44px; flex: none; border-radius: 12px; background: var(--plum); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 1.1rem; }
-[data-testid="stSidebar"] .logo::after { content: ""; position: absolute; right: -4px; bottom: -4px; width: 14px; height: 14px; border-radius: 50%; background: var(--coral); border: 2px solid var(--lavender); }
+[data-testid="stSidebar"] .logo-image { width: 58px; height: 58px; flex: none; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
 [data-testid="stSidebar"] .brand { font-family: 'Fraunces', Georgia, serif; font-size: 1.2rem; font-weight: 700; color: var(--plum); line-height: 1.15; }
 [data-testid="stSidebar"] .tagline { font-size: .85rem; color: var(--muted); margin-top: 2px; }
 [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] { gap: 4px; }
@@ -933,6 +933,39 @@ def page_home():
         st.write_stream(typewriter_chunks(f"{greeting}{blurb}"))
         st.markdown(f'<div class="chips">{chips}</div>', unsafe_allow_html=True)
 
+    st.header("Why Multimodal Studio Hub?")
+    opening_text_col, coin_toss_gif_col = st.columns([3, 2], vertical_alignment="top")
+    with opening_text_col:
+        st.markdown("""
+In Michael Jackson’s *Smooth Criminal*, the protagonist enters a speakeasy-like salon cloaked in stillness. The atmosphere is quiet, subdued, and almost lifeless. Then, with a simple flick of his hand, he sends a coin spinning through the air. The coin arcs across the room and lands precisely in a jukebox. In an instant, everything changes.
+        """)
+    with coin_toss_gif_col:
+        coin_toss_gif = Path(__file__).resolve().parent / "assets" / "smooth-criminal-coin-toss.gif"
+        if coin_toss_gif.is_file():
+            st.image(str(coin_toss_gif), width=240, caption="Smooth Criminal coin toss")
+
+    st.markdown("""
+The room comes alive. Music fills the space. Movement replaces stillness. Personalities emerge. People dance, interact, and express themselves through rhythm, gesture, costume, sound, and performance. What was once a muted environment becomes a vibrant scene rich with energy, creativity, and human expression.
+
+At the center of this transformation is a seemingly ordinary artifact: a coin. Yet that small object serves as a catalyst, triggering a chain reaction that remixes the entire environment. The coin does not create the people, the music, or the energy on its own. Rather, it unlocks possibilities that were already waiting to be activated.
+    """)
+
+    vision_text_col, vision_logo_col = st.columns([3, 1.2], vertical_alignment="center")
+    with vision_text_col:
+        st.markdown("That image inspires the vision behind the **Multimodal Studio Hub.**")
+    with vision_logo_col:
+        logo_path = Path(__file__).resolve().parent / "assets" / "msh-logo.jpg"
+        if logo_path.is_file():
+            st.image(str(logo_path), width=220, caption="Multimodal Studio Hub")
+
+    st.markdown("""
+The Multimodal Studio Hub is designed to be that catalyst. It is a place where a seemingly ordinary idea, draft, assignment, or text can be transformed through the thoughtful use of multiple modes of communication. A piece of writing need not remain static or confined to words alone. Through sound, visuals, gesture, design, movement, spatial arrangement, and digital media, it can be remixed into something more engaging, impactful, and meaningful.
+
+The Hub seeks to help students and instructors of English communication recognize and leverage the affordances of different communicative modes, from linguistic and visual expression to audio, oral, embodied, and interactive forms. By bringing together resources, exemplars, tools, and pedagogical practices, the Hub aims to spark creativity, encourage experimentation, and breathe new life into multimodal composing.
+
+Just as a single coin sets an entire room in motion in *Smooth Criminal,* the Multimodal Studio Hub seeks to provide the inspiration, resources, and momentum that transform an initial idea into a rich and dynamic multimodal creation in a digital space.
+    """)
+
     # Calls to action under the hero (one primary, one secondary)
     c1, c2, _ = st.columns([1, 1, 2])
     if instructor:
@@ -1010,6 +1043,88 @@ def page_about():
         ))
 
 
+    # Center the shaded 3D logo sphere directly below the About hero.
+    logo_path = Path(__file__).resolve().parent / "assets" / "msh-logo.jpg"
+    if logo_path.is_file():
+        logo_data = base64.b64encode(logo_path.read_bytes()).decode("ascii")
+        sphere_html = """
+        <style>
+          #about-msh-logo-sphere { display: block; width: 160px; height: 160px; margin: 8px auto; }
+          #about-msh-logo-texture { display: none; }
+        </style>
+        <div style="display:flex; justify-content:center; align-items:center;">
+          <canvas id="about-msh-logo-sphere" width="180" height="180"
+                  role="img" aria-label="Rotating Multimodal Studio Hub logo"></canvas>
+          <img id="about-msh-logo-texture" src="data:image/jpeg;base64,__LOGO_DATA__" alt="" />
+        </div>
+        <script>
+          const logoImage = document.getElementById("about-msh-logo-texture");
+          const sphereCanvas = document.getElementById("about-msh-logo-sphere");
+          const sphereContext = sphereCanvas.getContext("2d");
+          const textureCanvas = document.createElement("canvas");
+          const textureContext = textureCanvas.getContext("2d");
+
+          function startAboutLogoSphere() {
+            textureCanvas.width = logoImage.naturalWidth;
+            textureCanvas.height = logoImage.naturalHeight;
+            textureContext.drawImage(logoImage, 0, 0);
+            const texture = textureContext.getImageData(0, 0, textureCanvas.width, textureCanvas.height);
+            const output = sphereContext.createImageData(sphereCanvas.width, sphereCanvas.height);
+            const source = texture.data;
+            const pixels = output.data;
+            const size = sphereCanvas.width;
+            const radius = size / 2;
+            const lightX = -0.35, lightY = 0.45, lightZ = 0.82;
+
+            function render(angle) {
+              for (let y = 0; y < size; y++) {
+                const ny = (radius - y - 0.5) / radius;
+                for (let x = 0; x < size; x++) {
+                  const nx = (x + 0.5 - radius) / radius;
+                  const distanceSquared = nx * nx + ny * ny;
+                  const outputIndex = (y * size + x) * 4;
+                  if (distanceSquared > 1) {
+                    pixels[outputIndex + 3] = 0;
+                    continue;
+                  }
+                  const nz = Math.sqrt(1 - distanceSquared);
+                  const longitude = Math.atan2(nx, nz) + angle;
+                  const u = ((longitude / (2 * Math.PI) + 0.5) % 1 + 1) % 1;
+                  const latitude = Math.asin(ny);
+                  const v = Math.max(0, Math.min(1, 0.5 - latitude / Math.PI));
+                  const sourceX = Math.min(textureCanvas.width - 1, Math.floor(u * textureCanvas.width));
+                  const sourceY = Math.min(textureCanvas.height - 1, Math.floor(v * textureCanvas.height));
+                  const sourceIndex = (sourceY * textureCanvas.width + sourceX) * 4;
+                  const illumination = Math.max(0, nx * lightX + ny * lightY + nz * lightZ);
+                  const shade = 0.28 + 0.72 * illumination;
+                  const highlight = Math.pow(illumination, 24) * 0.2;
+                  pixels[outputIndex] = Math.min(255, source[sourceIndex] * shade + 255 * highlight);
+                  pixels[outputIndex + 1] = Math.min(255, source[sourceIndex + 1] * shade + 255 * highlight);
+                  pixels[outputIndex + 2] = Math.min(255, source[sourceIndex + 2] * shade + 255 * highlight);
+                  pixels[outputIndex + 3] = Math.min(255, Math.round((1 - Math.sqrt(distanceSquared)) * radius * 2 + 127));
+                }
+              }
+              sphereContext.putImageData(output, 0, 0);
+            }
+
+            render(0);
+            if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+              const startTime = performance.now();
+              function animate(now) {
+                render(((now - startTime) / 8000) * 2 * Math.PI);
+                requestAnimationFrame(animate);
+              }
+              requestAnimationFrame(animate);
+            }
+          }
+
+          if (logoImage.complete && logoImage.naturalWidth) startAboutLogoSphere();
+          else logoImage.onload = startAboutLogoSphere;
+        </script>
+        """.replace("__LOGO_DATA__", logo_data)
+        components.html(sphere_html, height=180, scrolling=False)
+
+
     # The Why Block
     st.header("Why multimodal learning?")
     st.write("People communicate in many forms. The Hub helps learners and instructors choose, combine, and teach the formats that best serve their purpose.")
@@ -1027,12 +1142,30 @@ def page_about():
                 st.write(description)
 
     # Our Story and Mission
-    st.header("Our story and mission")
-    st.write("We are building a welcoming starting point for multimodal teaching and making: useful resources, examples, and guidance in one place.")
+    st.header("Mission 💡")
+    st.write(
+        "The mission of the Multimodal Studio Hub is to support multimodal composition by "
+        "providing a centralized collection of high-quality teaching and learning resources. "
+        "The Hub brings together guides, lesson plans, activities, exemplars, and assessment "
+        "tools that can help instructors and students engage with written, visual, audio, and "
+        "video communication. Through accessible and user-centered resources, the Hub aims to "
+        "foster effective design, critical media literacy, and the creation of meaningful "
+        "digital content for real-world audiences."
+    )
+    st.subheader("Goals 🎯")
+    st.write("The Multimodal Studio Hub aims to:")
+    st.markdown("""
+    - Increase access to multimodal composition resources for instructors and students.
+    - Curate and organize guides, activities, lesson plans, exemplars, and rubrics that support multimodal instruction.
+    - Facilitate the design, production, and revision of multimodal projects across text, image, audio, and video modes.
+    - Encourage audience-centered communication and digital storytelling practices.
+    - Ensure multimodal resources are accessible, inclusive, and easy to navigate and implement in educational settings.
+    """)
+
     milestones = [
-        ("The idea", "Make multimodal teaching resources easier to find and use."),
-        ("The collection", "Bring together guides, activities, exemplars, lesson plans, and rubrics."),
-        ("What comes next", "Keep growing the library with the needs of learners and instructors in mind."),
+        ("The idea 💡", "Make multimodal teaching resources easier to find and use."),
+        ("The collection 🧰", "Bring together guides, activities, exemplars, lesson plans, and rubrics."),
+        ("What comes next? 🤔", "Keep growing the library with the needs of learners and instructors in mind."),
     ]
     cols = st.columns(3)
     for i, (col, (heading, description)) in enumerate(zip(cols, milestones), start=1):
@@ -1041,17 +1174,11 @@ def page_about():
                 st.markdown(f'<div class="about-timeline"><h3>{heading}</h3><p>{description}</p></div>', unsafe_allow_html=True)
 
     # Meet the Team. Replace names, bios, and photo paths with your team details.
-    st.header("Meet the team")
+    st.header("About the Multimodal Studio Hub Founder")
     team = [
-        {"name": "Team Member Name", "role": "Multimodal Learning",
-         "bio": "Supports learning design across written, visual, audio, and video projects.",
+        {"name": "Meet Isaac", "role": "Multimodal Learning",
+         "bio": "I am a PhD student in Rhetoric and Professional Communication (RPC). I am also co-majoring in Human-Computer Interaction (HCI) at Iowa State University in Ames, Iowa. I am passionate about user experience design research, the rhetoric of multiliteracies, and multimodal program evaluation and remediation.",
          "photo": "assets/team-member-1.jpg"},
-        {"name": "Team Member Name", "role": "Digital Media",
-         "bio": "Helps learners plan, produce, and revise digital media for real audiences.",
-         "photo": "assets/team-member-2.jpg"},
-        {"name": "Team Member Name", "role": "Accessibility and Inclusion",
-         "bio": "Focuses on making multimodal resources clear, usable, and accessible.",
-         "photo": "assets/team-member-3.jpg"},
     ]
     cols = st.columns(len(team))
     for i, (col, member) in enumerate(zip(cols, team), start=1):
@@ -1059,24 +1186,50 @@ def page_about():
             with card(f"about-team-{i}"):
                 photo = Path(member["photo"])
                 if photo.is_file():
-                    st.image(str(photo), use_container_width=True)
+                    st.image(str(photo), width=200)
                 else:
                     initials = "".join(part[0] for part in member["name"].split()[:2]).upper()
                     st.markdown(f'<div class="team-photo-fallback" role="img" aria-label="Photo placeholder for {esc(member["name"])}">{initials}</div>', unsafe_allow_html=True)
                 st.markdown(f'<h3 class="res-title">{esc(member["name"])}</h3>', unsafe_allow_html=True)
                 st.caption(member["role"])
                 st.write(member["bio"])
+                if member["name"] == "Meet Isaac":
+                    st.link_button(
+                        "Contact Me",
+                        "mailto:ewuoso@iastate.edu?subject=Contact%20Isaac",
+                        use_container_width=True,
+                    )
+
+    st.header("Stay In Touch 📨")
+    st.write(
+        "**The Multimodal Studio Hub Exchange** is a quarterly newsletter that brings together "
+        "the latest research, insights, and developments in multimodal pedagogy. Created for "
+        "educators in English and communication courses, it offers curated resources, teaching "
+        "inspiration, and opportunities to connect with a growing interdisciplinary community "
+        "of practice."
+    )
+    st.link_button(
+        "Join the Multimodal Studio Hub Exchange",
+        "https://docs.google.com/forms/d/e/1FAIpQLSe2L7FkTtUcSJmzJMy9GFdRzc9KYKTWzVLjJDvmwQ-dsLry3A/viewform?usp=publish-editor",
+        type="primary",
+        use_container_width=True,
+    )
 
     # Call to Action
     st.divider()
     with panel("about-cta"):
-        st.header("Ready to explore?")
+        st.header("Ready to explore? 🔍")
         st.write("Find a resource for your next project, course, or creative idea.")
-        c1, c2 = st.columns(2)
+        c1, c2, c3 = st.columns(3)
         c1.button("Explore the Resource Library", key="about_library", type="primary",
-                  on_click=go_to, args=("Search Resources",))
+                  on_click=go_to, args=("Search Resources",), use_container_width=True)
         c2.button("Browse Exemplars", key="about_exemplars", on_click=go_to,
-                  args=("Browse Exemplars",))
+                  args=("Browse Exemplars",), use_container_width=True)
+        c3.link_button(
+            "Visit Multimodal Studio Hub on YouTube",
+            "https://youtube.com/@multimodalstudiohub?si=kDx4PdJnNcc1ypE1",
+            use_container_width=True,
+        )
 
 
 # --- Search page helpers: callbacks run before the page reruns, so they can set widget values ---
@@ -1683,7 +1836,7 @@ PAGES = {
 def render_copyright_footer():
     """Show the site copyright notice at the bottom of the current page."""
     st.markdown(
-        '<footer class="site-footer">Copyright &copy; 2026 The Multimodal Studio Hub. All Rights Reserved</footer>',
+        '<footer class="site-footer">Copyright &copy; 2026 The Multimodal Studio Hub. All Rights Reserved&nbsp;&nbsp;<a href="https://youtube.com/@multimodalstudiohub?si=kDx4PdJnNcc1ypE1" target="_blank" rel="noopener noreferrer" aria-label="Visit Multimodal Studio Hub on YouTube" title="Visit Multimodal Studio Hub on YouTube" style="display:inline-flex;align-items:center;vertical-align:middle;color:#FF0000;text-decoration:none;"><svg aria-hidden="true" width="24" height="17" viewBox="0 0 24 17" xmlns="http://www.w3.org/2000/svg" style="display:block;"><rect width="24" height="17" rx="4" fill="#FF0000"/><path d="M10 4.5L16 8.5L10 12.5V4.5Z" fill="#FFFFFF"/></svg></a></footer>',
         unsafe_allow_html=True,
     )
 
@@ -1725,20 +1878,32 @@ def show_welcome_splash():
 
     # Show the video immediately with its swivel landing animation; reveal the button two seconds later.
     intro_video = Path("assets/welcome-intro.mp4")
-    if intro_video.is_file():
-        st.video(str(intro_video))
-    else:
-        st.video("https://www.youtube.com/watch?v=j28H9btX5vs")
+    _, video_col, _ = st.columns([0.5, 3, 0.5])
+    with video_col:
+        if intro_video.is_file():
+            st.video(str(intro_video))
+        else:
+            st.video("https://www.youtube.com/watch?v=j28H9btX5vs")
 
     time.sleep(2)
-    left, center, right = st.columns([1, 1.4, 1])
-    if center.button(
+    left, begin_col, learn_col, right = st.columns([1, 1.4, 1.2, 1])
+
+    if begin_col.button(
         "▶ Begin Here",
         key="welcome_begin",
         type="primary",
         use_container_width=True,
     ):
         st.session_state["welcome_splash_shown"] = True
+        st.rerun()
+
+    if learn_col.button(
+        "Learn More",
+        key="welcome_learn_more",
+        use_container_width=True,
+    ):
+        st.session_state["welcome_splash_shown"] = True
+        st.session_state["nav"] = "About"
         st.rerun()
 
     render_copyright_footer()
@@ -1757,12 +1922,18 @@ def main():
 
     # Logo block: shown on every screen, including sign in and the tutorial
     with st.sidebar:
-        # Logo placeholder: swap the "MS" block for your real logo (for example st.image) when you have one
-        st.markdown(
-            '<div class="logo-row"><div class="logo" role="img" aria-label="Logo placeholder">MS</div>'
-            '<div><div class="brand">Multimodal Studio Hub</div><div class="tagline">Teaching resources for multimodal projects</div></div></div>',
-            unsafe_allow_html=True,
-        )
+        logo_col, brand_col = st.columns([1, 3])
+        with logo_col:
+            st.image(
+                str(Path(__file__).resolve().parent / "assets" / "msh-logo.jpg"),
+                width=56,
+            )
+        with brand_col:
+            st.markdown(
+                '<div class="brand">Multimodal Studio Hub</div>'
+                '<div class="tagline">Teaching resources for multimodal projects</div>',
+                unsafe_allow_html=True,
+            )
 
     # Accounts: signed-out visitors see sign up / log in, new users see the tutorial, and the script
     # stops inside this call until they are done. Everything below runs only for signed-in users.
@@ -1770,6 +1941,17 @@ def main():
     projects.redeem_pending_share(user)
 
     with st.sidebar:
+        if user.get("role") == "student":
+            video_is_visible = st.session_state.get("show_student_tutorial_video", False)
+            video_button_label = "Hide Tutorial Video" if video_is_visible else "Tutorial Video"
+            if st.button(video_button_label, key="student_tutorial_video", use_container_width=True):
+                st.session_state["show_student_tutorial_video"] = not video_is_visible
+        elif user.get("role") == "instructor":
+            video_is_visible = st.session_state.get("show_instructor_tutorial_video", False)
+            video_button_label = "Hide Tutorial Video" if video_is_visible else "Tutorial Video"
+            if st.button(video_button_label, key="instructor_tutorial_video", use_container_width=True):
+                st.session_state["show_instructor_tutorial_video"] = not video_is_visible
+
         auth.render_account_sidebar(user)  # name, role, replay tutorial, log out
         st.caption("All content is placeholder data. Replace it in Section 3 of this file.")
 
@@ -1781,6 +1963,23 @@ def main():
         horizontal=True,
         label_visibility="collapsed",
     )
+
+    if user.get("role") == "student" and st.session_state.get("show_student_tutorial_video", False):
+        _, video_col, _ = st.columns([0.5, 3, 0.5])
+        with video_col:
+            st.video("https://www.youtube.com/watch?v=6etcFarw_mc")
+            _, skip_button, _ = st.columns([1, 1, 1])
+            if skip_button.button("Skip video", key="skip_student_tutorial_video", use_container_width=True):
+                st.session_state["show_student_tutorial_video"] = False
+                st.rerun()
+    elif user.get("role") == "instructor" and st.session_state.get("show_instructor_tutorial_video", False):
+        _, video_col, _ = st.columns([0.5, 3, 0.5])
+        with video_col:
+            st.video("https://youtu.be/BX-O7NU8tWE")
+            _, skip_button, _ = st.columns([1, 1, 1])
+            if skip_button.button("Skip video", key="skip_instructor_tutorial_video", use_container_width=True):
+                st.session_state["show_instructor_tutorial_video"] = False
+                st.rerun()
 
     PAGES[st.session_state["nav"]]()
     render_copyright_footer()
