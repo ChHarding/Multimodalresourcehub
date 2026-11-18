@@ -1141,7 +1141,8 @@ def render_projects_page(user):
       }
     }
 
-    .st-key-open_multimodal_tutor_buddy {
+    .st-key-open_multimodal_tutor_buddy,
+    .st-key-show_tutor_buddy_guide {
       display: flex;
       justify-content: center;
       width: 100%;
@@ -1150,6 +1151,10 @@ def render_projects_page(user):
     .st-key-open_multimodal_tutor_buddy button {
       min-width: 260px;
       animation: tutor-buddy-glow 1.8s ease-in-out infinite;
+    }
+
+    .st-key-show_tutor_buddy_guide button {
+      min-width: 260px;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1162,8 +1167,26 @@ def render_projects_page(user):
 
     buddy_is_open = st.session_state.get("show_multimodal_tutor_buddy", False)
     buddy_label = "Hide Multimodal Tutor Buddy" if buddy_is_open else "Multimodal Tutor Buddy"
-    if st.button(buddy_label, key="open_multimodal_tutor_buddy"):
+    guide_is_open = st.session_state.get("show_tutor_buddy_guide", False)
+    guide_label = "Hide Tutor Buddy Guide" if guide_is_open else "Using the Multimodal Tutor Buddy"
+    _, buddy_col, guide_col, _ = st.columns([1, 2, 2, 1])
+    if buddy_col.button(buddy_label, key="open_multimodal_tutor_buddy", use_container_width=True):
         st.session_state["show_multimodal_tutor_buddy"] = not buddy_is_open
+    if guide_col.button(guide_label, key="show_tutor_buddy_guide", use_container_width=True):
+        st.session_state["show_tutor_buddy_guide"] = not guide_is_open
+
+    if st.session_state.get("show_tutor_buddy_guide", False):
+        with st.container(border=True):
+            st.subheader("Using the Multimodal Tutor Buddy")
+            st.markdown("""
+1. **Set up your project:** Choose the original and target modes, summarize your original work, and describe the core message you want to carry forward.
+2. **Check your core message:** Get feedback on whether you identified the purpose, audience, main claim, and essential supporting material.
+3. **Review your transduction plan:** Describe what you will keep, leave out, and gain in the new mode.
+4. **Explain a design choice:** Name one choice and why it fits your message, audience, or target mode.
+5. **Review your draft:** Describe or transcribe your draft and request feedback across all lenses or focus on one.
+            """)
+            st.caption("The Tutor Buddy offers formative suggestions, not a finished assignment. Avoid including names or sensitive personal information.")
+
     if st.session_state.get("show_multimodal_tutor_buddy", False):
         render_multimodal_tutor_buddy()
 
